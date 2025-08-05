@@ -27,6 +27,8 @@ The retrieved results from the concurrent queries are then fused using an Intell
 
 ---
 
+This project is curently being developped on `dev` branch/
+
 This project is based on my MRCA APH-IF (Mining Regulatory Compliance Assistant) project, which is a web application that uses AHP-IF to provide quick, reliable, and easy access to MSHA (Mine Safety and Health Administration) regulations using natural language queries.
 
 MRCA APH-IF Website: https://mrca-frontend.onrender.com/  
@@ -36,14 +38,26 @@ MRCA APH-IFGitHub rep.: https://github.com/Omegapy/MRCA-Advanced-Parallel-Hybrid
 Please contact me (a.omegapy@gmail.com) if this happend and you still want to try the application.
 
 ---
+ 
+<img width="30" height="30" align="center" src="https://github.com/user-attachments/assets/a8e0ea66-5d8f-43b3-8fff-2c3d74d57f53"> **Alexander Ricciardi (Omega.py)**
 
-© 2025 Alexander Samuel Ricciardi - All rights reserved.
-License: Apache-2.0 | Technology: Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF) Technology
+[![Website](https://img.shields.io/badge/Website-alexomegapy.com-blue)](https://www.alexomegapy.com)
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=flat&logo=medium&logoColor=white)](https://medium.com/@alex.omegapy)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/alex-ricciardi)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/Omegapy)  
+Date: 08/05/2025
 
 ---
 
-<img width="30" height="30" align="center" src="https://github.com/user-attachments/assets/a8e0ea66-5d8f-43b3-8fff-2c3d74d57f53"> Alexander Ricciardi (Omega.py)   
-Date: 08/03/2025
+## License & Credits
+
+**© 2025 Alexander Samuel Ricciardi - All rights reserved.**
+
+- **License**: Apache-2.0
+- **Technology**: Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF)
+- **Version**: dev 0.0.1
+- **Author**: Alexander Ricciardi (Omega.py)
+- **Date**: August 2025
 
 ---
 
