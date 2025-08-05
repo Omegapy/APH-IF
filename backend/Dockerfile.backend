@@ -1,0 +1,59 @@
+# =========================================================================
+# Dockerfile.backend - APH-IF Backend Microservice
+# Project: APH-IF Technology Framework
+# Author: Alexander Ricciardi
+# Date: 2025-08-05
+# =========================================================================
+
+# --- Image Objective ---
+# This image provides the APH-IF backend microservice with FastAPI,
+# parallel hybrid processing, context fusion, and circuit breaker patterns.
+# Optimized for production deployment with health monitoring.
+# -------------------------------------------------------------------------
+
+# --- Base Image ---
+FROM python:3.12-slim
+
+# --- Metadata ---
+LABEL maintainer="Alexander Ricciardi <alex.omegapy@gmail.com>"
+LABEL description="APH-IF Backend Microservice"
+LABEL version="1.0.0"
+LABEL service="backend"
+
+# --- Working Directory ---
+WORKDIR /app
+
+# --- System Dependencies ---
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# --- Python Dependencies ---
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# --- Application Setup ---
+COPY backend/ ./backend/
+COPY .streamlit/ ./.streamlit/
+
+# Create necessary directories
+RUN mkdir -p /app/logs
+
+# --- Environment Variables ---
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV API_HOST=0.0.0.0
+ENV API_PORT=8000
+
+# --- Ports ---
+EXPOSE 8000
+
+# --- Health Check ---
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# --- Default Command ---
+CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
