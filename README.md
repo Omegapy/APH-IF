@@ -9,7 +9,7 @@
 
 ## Advanced Parallel HybridRAG - Intelligent Fusion Overview
 
-Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF) is a novel Retrieval Augmented Generation (RAG) system that differs from traditional RAG approaches by performing semantic and traversal searches concurrently, rather than sequentially, and fusing the the result using a LLM or a LRM to generate the final response.
+I am developing a new Retrieval-Augmented Generation (RAG) system, Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF) is a novel Retrieval Augmented Generation (RAG) system that differs from traditional RAG approaches by performing semantic and traversal searches concurrently, rather than sequentially, and fusing the results using an LLM or an LRM to generate the final response.
 
 ---
 
