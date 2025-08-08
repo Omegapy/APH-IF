@@ -1,129 +1,29 @@
-# =========================================================================
-# Docker Compose: docker-compose.yml
-# Project: APH-IF Technology Framework
-# Author: Alexander Ricciardi
-# Date: 2025-08-04
-# =========================================================================
-
-# version: '3.8'  # Version is now optional in Docker Compose
-
+version: "3.9"
 services:
-  # =======================================================================
-  # APH-IF Backend Microservice
-  # =======================================================================
-  aph-if-backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile.backend
+  aph_if_backend:
+    build: ./backend
+    env_file: ./backend/.env
     container_name: aph_if_backend
     ports:
-      - "8000:8000"  # FastAPI Backend
-    environment:
-      - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
-      - API_HOST=0.0.0.0
-      - API_PORT=8000
-    volumes:
-      - ./data:/app/data
-      - ./.streamlit:/app/.streamlit
-    depends_on:
-      - neo4j
-    networks:
-      - aph-if-network
+      - "8000:8000"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # =======================================================================
-  # APH-IF Frontend Microservice
-  # =======================================================================
-  aph-if-frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile.frontend
+  aph_if_data_processing:
+    build: ./data_processing
+    env_file: ./data_processing/.env
+    container_name: aph_if_data_processing
+    ports:
+      - "8010:8010"
+    restart: unless-stopped
+
+  aph_if_frontend:
+    build: ./frontend
+    env_file: ./frontend/.env
     container_name: aph_if_frontend
     ports:
-      - "8501:8501"  # Streamlit Frontend
-    environment:
-      - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
-      - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
-    volumes:
-      - ./data:/app/data
-      - ./.streamlit:/app/.streamlit
+      - "8501:8501"
     depends_on:
-      - aph-if-backend
-    networks:
-      - aph-if-network
+      - aph_if_backend
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # =======================================================================
-  # Neo4j Database Service
-  # =======================================================================
-  neo4j:
-    image: neo4j:5.15
-    container_name: aph_if_neo4j
-    ports:
-      - "7474:7474"  # Neo4j Browser
-      - "7687:7687"  # Bolt driver
-    environment:
-      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-YourStrongPassword}
-      - NEO4J_PLUGINS=["apoc"]
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
-    volumes:
-      - neo4j_data:/data
-      - neo4j_logs:/logs
-    networks:
-      - aph-if-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-YourStrongPassword}", "MATCH () RETURN count(*)"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
-# =========================================================================
-# Volume Definitions
-# =========================================================================
-volumes:
-  neo4j_data:
-    driver: local
-  neo4j_logs:
-    driver: local
-
-# =========================================================================
-# Network Definitions
-# =========================================================================
-networks:
-  aph-if-network:
-    driver: bridge
-
-# =========================================================================
-# Usage Instructions
-# =========================================================================
-#
-# Development Commands:
-#   Start services:     docker-compose up --build
-#   Start in background: docker-compose up --build -d
-#   View logs:          docker-compose logs -f
-#   Stop services:      docker-compose down
-#   Rebuild:            docker-compose build --no-cache
-#
-# Service Access:
-#   Streamlit UI:       http://localhost:8501
-#   Neo4j Browser:      http://localhost:7474
-#   Future FastAPI:     http://localhost:8000
-#
-# Environment Variables:
-#   NEO4J_PASSWORD:     Set password for Neo4j (default: YourStrongPassword)
-#
-# =========================================================================

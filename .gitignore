@@ -1,3 +1,45 @@
+# Environments and secrets
+.env
+**/.env
+secrets/
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build/dist
+build/
+dist/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Cursor
+.cursorrules
+.cursorignore
+.cursorindexingignore
+.augment/
+
 
 # Ignore all directories starting with 'i-'
 i-*/
