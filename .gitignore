@@ -1,5 +1,6 @@
 # Environments and secrets
 .env
+.env.*
 **/.env
 secrets/
 .streamlit/secrets.toml

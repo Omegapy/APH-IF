@@ -1,0 +1,21 @@
+[project]
+name = "data-processing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.0",
+    "langchain==0.3.27",
+    "langchain-community==0.3.27",
+    "langchain-experimental==0.3.4",
+    "langchain-neo4j>=0.5.0",
+    "langchain-openai==0.2.6",
+    "neo4j>=5.25.0",
+    "openai>=1.54.0,<2.0.0",
+    "pydantic-settings>=2.10.1",
+    "pypdf2==3.0.1",
+    "python-dotenv>=1.1.1",
+    "tiktoken==0.7.0",
+    "uvicorn==0.30.6",
+]

@@ -1,9 +1,12 @@
+
+# Version 
 # Advanced Parallel Hybrid - Intelligent Fusion (APH-IF) Technology
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![uv](https://img.shields.io/badge/uv-package%20manager-blue.svg)](https://github.com/astral-sh/uv)
 [![Neo4j](https://img.shields.io/badge/Neo4j-008CC1?style=flat&logo=neo4j&logoColor=white)](https://neo4j.com/)
+[![Windows](https://img.shields.io/badge/Windows-native%20development-blue.svg)](https://www.microsoft.com/windows)
 
 ---
 
@@ -53,348 +56,267 @@ Date: 08/05/2025
 
 - **License**: Apache-2.0
 - **Technology**: Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF)
-- **Version**: dev 0.0.1
+- **Version**: dev 0.0.4
 - **Author**: Alexander Ricciardi (Omega.py)
 - **Date**: August 2025
 
 ---
 
-## Quick Start
 
-### Prerequisites
-- **Docker** and **Docker Compose** installed
-- **8GB+ RAM** recommended
-- **Ports 8000, 8501, 7474, 7687** available
 
-### Launch APH-IF in 3 Steps
+---
 
-```bash
-# 1. Clone the repository
+## 🚀 Quick Start
+
+### Native Windows Development
+
+APH-IF is optimized for native Windows development using `uv` for fast, reliable Python package management:
+
+```powershell
+# 1. Install uv (Python package manager)
+iwr -useb https://astral.sh/uv/install.ps1 | iex
+
+# 2. Clone and setup
 git clone https://github.com/Omegapy/APH-IF-Dev.git
-cd APH-IF-Dev-v1
+cd APH-IF-Dev
+.\setup-dev.ps1
 
-# 2. Start all services
-docker-compose up --build -d
+# 3. Configure environment (choose your mode)
+.\switch-environment.ps1 -Environment development  # Safe for development
+.\switch-environment.ps1 -ShowCurrent              # Check current environment
 
-# 3. Access the application
+# 4. Start all services
+.\start-dev.ps1
+
+# 5. Access the application
 # Frontend: http://localhost:8501
-# Backend API: http://localhost:8000/docs
-# Neo4j Browser: http://localhost:7474
+# Backend API: http://localhost:8000/healthz
+# Data Processing: http://localhost:8010/healthz
 ```
 
-**That's it!** The APH-IF system is now running with all microservices.
+### 🌍 Environment Management
 
----
+APH-IF includes intelligent environment management with centralized `env_manager.py` for safe database operations:
 
-## Table of Contents
+- **Development Mode**: Uses development Neo4j instance (safe for experimentation)
+- **Production Mode**: Uses production Neo4j instance (live data - use with caution)
+- **Testing Mode**: Uses test Neo4j instance (only for explicit testing scenarios)
 
-- [Architecture Overview](#️-architecture-overview)
-- [Docker Services](#-docker-services)
-- [Service Endpoints](#-service-endpoints)
-- [Core Technology](#-core-technology)
-- [Configuration](#-configuration)
-- [API Documentation](#-api-documentation)
-- [Testing](#-testing)
-- [Development](#️-development)
-- [Background](#-background)
+```powershell
+# Switch environments safely using set_environment.py
+python set_environment.py --mode development
+python set_environment.py --mode production
+python set_environment.py --mode development --force-test-db true  # For testing only
 
----
-
-## Architecture Overview
-
-APH-IF implements a **microservices architecture** with **containerized deployment**:
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │    Database     │
-│   (Streamlit)   │◄──►│   (FastAPI)     │◄──►│    (Neo4j)      │
-│   Port: 8501    │    │   Port: 8000    │    │   Port: 7474    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                        │                        │
-        ▼                        ▼                        ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ • Overview UI   │    │ • APH-IF Engine │    │ • Graph Storage │
-│ • Bot Interface │    │ • Intelligent   │    │ • Vector Index  │
-│ • Documentation │    │   Fusion        │    │ • Relationships │
-│ • Monitoring    │    │ • Circuit Break │    │ • Embeddings    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+# Verify current environment
+python set_environment.py --status
 ```
 
-## Docker Services
+### 🧪 Testing with Environment Management
 
-APH-IF runs as **3 containerized microservices**:
+For safe testing that requires database access:
 
-| Service | Container | Image | Port | Health Check |
-|---------|-----------|-------|------|--------------|
-| **Frontend** | `aph_if_frontend` | `aph-if-dev-v1-aph-if-frontend` | `8501` | ✅ Healthy |
-| **Backend** | `aph_if_backend` | `aph-if-dev-v1-aph-if-backend` | `8000` | ✅ Healthy |
-| **Database** | `aph_if_neo4j` | `neo4j:5.15` | `7474, 7687` | ✅ Healthy |
+```powershell
+# Setup test environment
+python set_environment.py --mode development --force-test-db true
 
-### Container Details
+# Run your tests here
+# (modules automatically use test database)
 
-#### Frontend Container (`aph_if_frontend`)
-- **Technology**: Streamlit
-- **Purpose**: User interface and bot interaction
-- **Internal Communication**: `http://aph-if-backend:8000`
-- **External Access**: `http://localhost:8501`
-
-#### Backend Container (`aph_if_backend`)
-- **Technology**: FastAPI + Uvicorn
-- **Purpose**: APH-IF processing engine
-- **Features**: Parallel HybridRAG, Intelligent Fusion, Circuit Breaker
-- **External Access**: `http://localhost:8000`
-
-#### Database Container (`aph_if_neo4j`)
-- **Technology**: Neo4j Graph Database
-- **Purpose**: Knowledge graph storage with vector embeddings
-- **Browser Access**: `http://localhost:7474`
-- **Bolt Protocol**: `bolt://localhost:7687`
-
----
-
-## Service Endpoints
-
-### Frontend (Port 8501)
-```
-http://localhost:8501
-├── Overview Interface
-├── Bot Chat Interface  
-├── Documentation
-└── System Monitoring
+# Cleanup - switch back to development database
+python set_environment.py --mode development --force-test-db false
 ```
 
-### Backend API (Port 8000)
+## 🏗️ Project Architecture
+
+### Service Structure
+
+APH-IF uses a microservices architecture with isolated environments:
+
 ```
-http://localhost:8000
-├── /                           # Service info
-├── /docs                       # Swagger UI
-├── /health                     # Health check
-├── /parallel_hybrid/health     # Detailed health
-└── /generate_parallel_hybrid   # Main processing endpoint
+APH-IF-Dev/
+├── backend/              # FastAPI REST API service
+│   ├── app/             # Application code
+│   ├── tests/           # Backend tests
+│   ├── pyproject.toml   # Backend dependencies
+│   └── .venv/           # Isolated virtual environment
+├── data_processing/      # Data ingestion and graph building
+│   ├── processing/      # Core processing modules
+│   ├── tests/           # Processing tests
+│   ├── pyproject.toml   # Processing dependencies
+│   └── .venv/           # Isolated virtual environment
+├── frontend/            # Streamlit web interface
+│   ├── app/             # Frontend application
+│   ├── pyproject.toml   # Frontend dependencies
+│   └── .venv/           # Isolated virtual environment
+├── common/              # Shared utilities and models
+│   ├── config.py        # Shared configuration
+│   ├── logging.py       # Logging utilities
+│   └── models.py        # Shared data models
+├── env_manager.py       # Centralized environment management
+├── check_environment.py # Environment validation utility
+└── .env                 # Shared environment configuration
 ```
 
-### Neo4j Database (Port 7474)
-```
-http://localhost:7474
-├── Neo4j Browser Interface
-├── Graph visualization
-├── Cypher query console
-└── Database administration
-```
+### Key Components
 
----
+- **Backend Service** (`localhost:8000`): FastAPI REST API with health monitoring
+- **Data Processing Service** (`localhost:8010`): Document ingestion and graph building
+- **Frontend Service** (`localhost:8501`): Streamlit web interface
+- **Environment Management**: Centralized environment and database management via `set_environment.py`
+- **Neo4j AuraDB**: Cloud-based graph database with environment-aware instance selection
 
-## Core Technology
+## 🔧 Environment Management
 
-### **Advanced Parallel HybridRAG (APH)**
+### Centralized Environment Control
 
-**Traditional Sequential RAG:**
+APH-IF uses `env_manager.py` for safe, centralized environment management:
+
 ```python
-if condition:
-    results = vector_search(query)
-else:
-    results = graph_search(query)
+from env_manager import EnvManager
+
+# Environment switching
+EnvManager.set_env_mode(dev=True)           # Development mode
+EnvManager.set_env_mode(dev=False)          # Production mode
+
+# Test database control (development only)
+EnvManager.set_test_db_mode(force_test_db=True)   # Enable test DB
+EnvManager.set_test_db_mode(force_test_db=False)  # Disable test DB
+
+# Configuration access
+config = EnvManager.get_neo4j_config()
+app_env, force_test_db, verbose = EnvManager.get_current_mode()
+
+# Utilities
+EnvManager.print_current_status()           # Show current environment
+EnvManager.validate_environment()           # Validate configuration
 ```
 
-**APH-IF Parallel Approach:**
+### Environment Safety Rules
+
+1. **Development Mode**: Safe for experimentation with development database
+2. **Production Mode**: Live data - requires explicit confirmation for modifications
+3. **Testing Mode**: Only available in development environment with `FORCE_TEST_DB=true`
+4. **Always verify environment** before graph modifications: `python check_environment.py --require-test`
+
+### Database Instance Selection
+
+APH-IF automatically selects the appropriate Neo4j instance:
+
+- **NEO4J_URI_DEV**: Development database (safe for development work)
+- **NEO4J_URI_PROD**: Production database (live data - use with extreme caution)
+- **NEO4J_URI_TEST**: Test database (only when `FORCE_TEST_DB=true`)
+
+## 📦 UV Package Management
+
+### Service-Specific Environments
+
+Each service maintains its own isolated environment:
+
+```powershell
+# Backend service
+cd backend
+uv sync                    # Install/sync dependencies
+uv add fastapi            # Add new dependency
+uv remove package-name    # Remove dependency
+uv run uvicorn app.main:app --reload --port 8000
+
+# Data processing service
+cd data_processing
+uv sync
+uv add langchain
+uv run uvicorn processing.main:app --reload --port 8010
+
+# Frontend service
+cd frontend
+uv sync
+uv add streamlit
+uv run streamlit run app/bot.py --server.port 8501
+```
+
+### Development Scripts
+
+```powershell
+# Complete development workflow
+.\setup-dev.ps1                              # Initial setup (run once)
+.\switch-environment.ps1 -Environment development  # Set environment
+.\start-dev.ps1                              # Start all services
+# ... develop and test ...
+.\stop-dev.ps1                               # Stop all services
+
+# Selective service management
+.\start-dev.ps1 -Backend                     # Start only backend
+.\start-dev.ps1 -Backend -Frontend           # Start backend + frontend
+.\start-dev.ps1 -All                         # Start all services explicitly
+
+# Environment management
+.\switch-environment.ps1 -ShowCurrent        # Check current environment
+.\switch-environment.ps1 -Environment production  # Switch to production
+.\switch-environment.ps1 -Help               # Show all options
+```
+
+**📖 Comprehensive Guides:**
+- **[PowerShell Scripts Usage Guide](documents/powershell_scripts_usage_guide.md)** - Complete usage examples and troubleshooting
+- **[Cross-System Testing Guide](documents/cross_system_testing_guide.md)** - Testing procedures for different Windows configurations
+
+## 📚 Documentation
+
+### Core Documentation
+
+- **[Environment Management Guide](documents/environment_management_guide.md)** - Complete env_manager.py usage and safety patterns
+- **[UV Environment Guide](documents/uv_environment_guide.md)** - UV package manager usage and best practices
+- **[Data Processing Modules](documents/data_processing_modules.md)** - Complete guide to all data processing functionality
+
+### Module-Specific Documentation
+
+- **[Initial Graph Build](documents/initial_graph_build_usage.md)** - Building the hybrid knowledge store
+- **[Relationship Augmentation](documents/relationship_augmentation_usage.md)** - Adding entity relationships with LLM analysis
+- **[Document Embeddings](documents/compute_doc_embeddings_usage.md)** - Document embedding computation and storage
+- **[Pipeline Launcher](documents/launch_data_processing_usage.md)** - Unified data processing pipeline
+
+### Development Documentation
+
+- **[Environment Safety Patterns](documents/environment_safety_patterns.md)** - Safe database operation patterns
+- **[Testing with Environment Manager](documents/testing_patterns.md)** - Proper test environment setup and cleanup
+- **[Configuration Reference](documents/environment_configuration_reference.md)** - Complete environment variable reference
+
+---
+
+## 🧪 Testing and Development
+
+### Safe Testing Patterns
+
+Always use the environment manager for database tests:
+
 ```python
-vector_task = vector_search(query)
-graph_task = graph_search(query)
-vector_results, graph_results = await asyncio.gather(vector_task, graph_task)
+from env_manager import EnvManager
+
+def setup_module():
+    """Setup test environment before running tests."""
+    EnvManager.set_env_mode(dev=True)
+    EnvManager.set_test_db_mode(force_test_db=True)
+
+def teardown_module():
+    """Cleanup test environment after running tests."""
+    EnvManager.set_test_db_mode(force_test_db=False)
+
+def test_database_operation():
+    """Example test with proper environment management."""
+    EnvManager.set_test_db_mode(force_test_db=True)
+    try:
+        # Test code here - automatically uses test database
+        pass
+    finally:
+        EnvManager.set_test_db_mode(force_test_db=False)
 ```
 
-### **Intelligent Fusion (IF)**
+### VS Code Integration
 
-**LLM-Powered Result Combination:**
-```python
-fused_response = intelligent_fusion_engine.fuse_results(
-    vector_results=vector_results,
-    graph_results=graph_results,
-    original_query=query
-)
-```
+Use the compound debugging configuration for all services:
 
-### **Key Components**
-
-1. **ParallelHybridRAGEngine**: Coordinates concurrent VectorRAG and GraphRAG execution
-2. **IntelligentFusionEngine**: LLM-based result fusion and synthesis  
-3. **CircuitBreaker**: Fault tolerance and graceful degradation
-4. **ConfigManager**: Environment-based configuration management
-
----
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the project root:
-
-```bash
-# Database Configuration
-NEO4J_URI=bolt://aph_if_neo4j:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
-
-# LLM Configuration  
-OPENAI_API_KEY=your_openai_api_key
-LLM_MODEL=gpt-4
-LLM_TEMPERATURE=0.7
-
-# Parallel HybridRAG Settings
-PH_MAX_VECTOR_RESULTS=10
-PH_MAX_GRAPH_RESULTS=10
-PH_VECTOR_THRESHOLD=0.7
-PH_GRAPH_DEPTH=3
-PH_ENABLE_CACHING=true
-PH_CACHE_TTL=3600
-
-# Circuit Breaker Settings
-CB_FAILURE_THRESHOLD=5
-CB_RECOVERY_TIMEOUT=60
-CB_EXPECTED_EXCEPTION=Exception
-```
-
-### Docker Compose Configuration
-
-The `docker-compose.yml` handles:
-- **Service orchestration**
-- **Network configuration** 
-- **Volume mounting**
-- **Health checks**
-- **Environment variables**
-
----
-
-## API Documentation
-
-### Main Processing Endpoint
-
-**POST** `/generate_parallel_hybrid`
-
-**Request:**
-```json
-{
-  "query": "What is Advanced Parallel HybridRAG?",
-  "session_id": "optional-session-id",
-  "max_results": 10,
-  "include_metadata": true
-}
-```
-
-**Response:**
-```json
-{
-  "response": "Generated intelligent response...",
-  "session_id": "session-123",
-  "processing_time": 1.234,
-  "vector_results_count": 8,
-  "graph_results_count": 6,
-  "fusion_method": "intelligent",
-  "metadata": {
-    "vector_search_time": 0.456,
-    "graph_search_time": 0.389,
-    "total_results": 14,
-    "timestamp": "2025-08-05T10:30:00Z"
-  }
-}
-```
-
-### Health Check Endpoints
-
-**GET** `/health` - Basic service health  
-**GET** `/parallel_hybrid/health` - Detailed component health
-
----
-
-## Testing
-
-### Manual Testing
-
-```bash
-# Test backend health
-curl http://localhost:8000/health
-
-# Test processing endpoint
-curl -X POST "http://localhost:8000/generate_parallel_hybrid" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Test query", "max_results": 5}'
-
-# Check service status
-docker-compose ps
-```
-
-### Automated Testing
-
-```bash
-# Run test script
-python test_docker_setup.py
-
-# Check logs
-docker-compose logs aph_if_backend
-docker-compose logs aph_if_frontend
-```
-
----
-
-## Development
-
-### Local Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/Omegapy/APH-IF-Dev.git
-cd APH-IF-Dev-v1
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# .venv\Scripts\activate   # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start services
-docker-compose up --build
-```
-
-### Development Commands
-
-```bash
-# Rebuild specific service
-docker-compose up --build -d aph-if-backend
-
-# View logs
-docker-compose logs -f aph_if_backend
-
-# Stop all services
-docker-compose down
-
-# Clean rebuild
-docker-compose down
-docker-compose up --build -d
-```
-
-### Project Structure
-
-```
-APH-IF-Dev-v1/
-├── backend/                    # Backend microservice
-│   ├── main.py                # FastAPI application
-│   ├── parallel_hybrid.py     # ParallelHybridRAGEngine
-│   ├── context_fusion.py      # IntelligentFusionEngine
-│   ├── config.py              # Configuration management
-│   ├── llm.py                 # LLM integration
-│   ├── circuit_breaker.py     # Fault tolerance
-│   └── Dockerfile.backend     # Backend container
-├── frontend/                   # Frontend microservice
-│   ├── app.py                 # Streamlit application
-│   └── Dockerfile.frontend    # Frontend container
-├── docker-compose.yml         # Service orchestration
-├── requirements.txt           # Python dependencies
-└── README.md                  # This documentation
-```
-
----
+1. Open VS Code in project root
+2. Select "🚀 All Services (Development)" from debug configurations
+3. Start debugging - all services launch with proper environment isolation
 
 ## Background
 
@@ -404,8 +326,10 @@ APH-IF-Dev-v1/
 
 1. **True Parallelism**: Concurrent execution vs. sequential processing
 2. **Intelligent Fusion**: LLM-powered result synthesis vs. simple concatenation
-3. **Microservices Architecture**: Scalable, maintainable, containerized deployment
-4. **Fault Tolerance**: Circuit breaker patterns for production reliability
+3. **Native Windows Development**: Fast, reliable development with uv package manager
+4. **Environment Safety**: Intelligent environment management for safe database operations
+5. **Microservices Architecture**: Scalable, maintainable service deployment
+6. **Centralized Configuration**: Single `.env` file with intelligent instance selection
 
 
 

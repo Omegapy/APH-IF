@@ -19,3 +19,27 @@ addopts = "-q"
 pythonpath = ["."]
 
 
+# ----------------------------------------------------------------------------
+# Minimal project metadata to satisfy uv when invoked from the repo root.
+# NOTE: Dependencies are intentionally omitted at the root to keep service
+# environments isolated (backend/, data_processing/, frontend/, common/).
+# ----------------------------------------------------------------------------
+[project]
+name = "aph-if-root"
+version = "0.0.0"
+description = "APH-IF monorepo root; use per-service projects for code and deps."
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.27",
+    "langchain-experimental>=0.3.4",
+    "langchain-neo4j>=0.5.0",
+    "langchain-openai>=0.3.29",
+    "neo4j>=5.28.2",
+    "openai>=1.99.9",
+    "pypdf2>=3.0.1",
+    "python-dotenv>=1.1.1",
+    "tiktoken>=0.11.0",
+]
+
+
