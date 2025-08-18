@@ -211,27 +211,7 @@ uv sync
 uv add streamlit
 uv run streamlit run app/bot.py --server.port 8501
 ```
-
-
-
-**Comprehensive Guides:**
-- **[PowerShell Scripts Usage Guide](documents/powershell_scripts_usage_guide.md)** - Complete usage examples and troubleshooting
-- **[Cross-System Testing Guide](documents/cross_system_testing_guide.md)** - Testing procedures for different Windows configurations
-
-## Documentation
-
-### Core Documentation
-
-- **[Environment Management Guide](documents/environment_management_guide.md)** - Complete env_manager.py usage and safety patterns
-- **[UV Environment Guide](documents/uv_environment_guide.md)** - UV package manager usage and best practices
-- **[Data Processing Modules](documents/data_processing_modules.md)** - Complete guide to all data processing functionality
-
-### Module-Specific Documentation
-
-- **[Initial Graph Build](documents/initial_graph_build_usage.md)** - Building the hybrid knowledge store
-- **[Relationship Augmentation](documents/relationship_augmentation_usage.md)** - Adding entity relationships with LLM analysis
-- **[Document Embeddings](documents/compute_doc_embeddings_usage.md)** - Document embedding computation and storage
-- **[Pipeline Launcher](documents/launch_data_processing_usage.md)** - Unified data processing pipeline
+---
 
 ### Development Documentation
 
