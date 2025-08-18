@@ -1,4 +1,4 @@
-3 vERSION DEV ALPHA 0.0.4
+# Version dev alpha 0.0.4
 
 # Advanced Parallel Hybrid - Intelligent Fusion (APH-IF) Technology
 
