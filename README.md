@@ -1,5 +1,5 @@
+3 vERSION DEV ALPHA 0.0.4
 
-# Version 
 # Advanced Parallel Hybrid - Intelligent Fusion (APH-IF) Technology
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -56,17 +56,13 @@ Date: 08/05/2025
 
 - **License**: Apache-2.0
 - **Technology**: Advanced Parallel HybridRAG - Intelligent Fusion (APH-IF)
-- **Version**: dev 0.0.4
+- **Version**: dev ALPHA 0.0.4
 - **Author**: Alexander Ricciardi (Omega.py)
 - **Date**: August 2025
 
 ---
 
-
-
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Native Windows Development
 
@@ -94,9 +90,9 @@ cd APH-IF-Dev
 # Data Processing: http://localhost:8010/healthz
 ```
 
-### 🌍 Environment Management
+### Environment Management
 
-APH-IF includes intelligent environment management with centralized `env_manager.py` for safe database operations:
+APH-IF includes intelligent environment management with centralized `set_environment.py` for safe database operations:
 
 - **Development Mode**: Uses development Neo4j instance (safe for experimentation)
 - **Production Mode**: Uses production Neo4j instance (live data - use with caution)
@@ -109,10 +105,10 @@ python set_environment.py --mode production
 python set_environment.py --mode development --force-test-db true  # For testing only
 
 # Verify current environment
-python set_environment.py --status
+python set_environment.py --preview
 ```
 
-### 🧪 Testing with Environment Management
+### Testing with Environment Management
 
 For safe testing that requires database access:
 
@@ -127,7 +123,7 @@ python set_environment.py --mode development --force-test-db true
 python set_environment.py --mode development --force-test-db false
 ```
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ### Service Structure
 
@@ -153,7 +149,7 @@ APH-IF-Dev/
 │   ├── config.py        # Shared configuration
 │   ├── logging.py       # Logging utilities
 │   └── models.py        # Shared data models
-├── env_manager.py       # Centralized environment management
+├── set_environment.py   # Centralized environment management
 ├── check_environment.py # Environment validation utility
 └── .env                 # Shared environment configuration
 ```
@@ -166,31 +162,13 @@ APH-IF-Dev/
 - **Environment Management**: Centralized environment and database management via `set_environment.py`
 - **Neo4j AuraDB**: Cloud-based graph database with environment-aware instance selection
 
-## 🔧 Environment Management
+## Environment Management
 
 ### Centralized Environment Control
 
-APH-IF uses `env_manager.py` for safe, centralized environment management:
+APH-IF uses `set_environment.py` for safe, centralized environment management:
 
-```python
-from env_manager import EnvManager
-
-# Environment switching
-EnvManager.set_env_mode(dev=True)           # Development mode
-EnvManager.set_env_mode(dev=False)          # Production mode
-
-# Test database control (development only)
-EnvManager.set_test_db_mode(force_test_db=True)   # Enable test DB
-EnvManager.set_test_db_mode(force_test_db=False)  # Disable test DB
-
-# Configuration access
-config = EnvManager.get_neo4j_config()
-app_env, force_test_db, verbose = EnvManager.get_current_mode()
-
-# Utilities
-EnvManager.print_current_status()           # Show current environment
-EnvManager.validate_environment()           # Validate configuration
-```
+--- 
 
 ### Environment Safety Rules
 
@@ -207,7 +185,7 @@ APH-IF automatically selects the appropriate Neo4j instance:
 - **NEO4J_URI_PROD**: Production database (live data - use with extreme caution)
 - **NEO4J_URI_TEST**: Test database (only when `FORCE_TEST_DB=true`)
 
-## 📦 UV Package Management
+## UV Package Management
 
 ### Service-Specific Environments
 
@@ -234,32 +212,13 @@ uv add streamlit
 uv run streamlit run app/bot.py --server.port 8501
 ```
 
-### Development Scripts
 
-```powershell
-# Complete development workflow
-.\setup-dev.ps1                              # Initial setup (run once)
-.\switch-environment.ps1 -Environment development  # Set environment
-.\start-dev.ps1                              # Start all services
-# ... develop and test ...
-.\stop-dev.ps1                               # Stop all services
 
-# Selective service management
-.\start-dev.ps1 -Backend                     # Start only backend
-.\start-dev.ps1 -Backend -Frontend           # Start backend + frontend
-.\start-dev.ps1 -All                         # Start all services explicitly
-
-# Environment management
-.\switch-environment.ps1 -ShowCurrent        # Check current environment
-.\switch-environment.ps1 -Environment production  # Switch to production
-.\switch-environment.ps1 -Help               # Show all options
-```
-
-**📖 Comprehensive Guides:**
+**Comprehensive Guides:**
 - **[PowerShell Scripts Usage Guide](documents/powershell_scripts_usage_guide.md)** - Complete usage examples and troubleshooting
 - **[Cross-System Testing Guide](documents/cross_system_testing_guide.md)** - Testing procedures for different Windows configurations
 
-## 📚 Documentation
+## Documentation
 
 ### Core Documentation
 
@@ -282,40 +241,31 @@ uv run streamlit run app/bot.py --server.port 8501
 
 ---
 
-## 🧪 Testing and Development
+## Testing and Development
 
 ### Safe Testing Patterns
 
 Always use the environment manager for database tests:
 
-```python
-from env_manager import EnvManager
+```powershell
+# Setup test environment before running tests
+python set_environment.py --mode development --force-test-db true
 
-def setup_module():
-    """Setup test environment before running tests."""
-    EnvManager.set_env_mode(dev=True)
-    EnvManager.set_test_db_mode(force_test_db=True)
+# Run your tests here
+# (modules automatically use test database)
 
-def teardown_module():
-    """Cleanup test environment after running tests."""
-    EnvManager.set_test_db_mode(force_test_db=False)
-
-def test_database_operation():
-    """Example test with proper environment management."""
-    EnvManager.set_test_db_mode(force_test_db=True)
-    try:
-        # Test code here - automatically uses test database
-        pass
-    finally:
-        EnvManager.set_test_db_mode(force_test_db=False)
+# Cleanup test environment after running tests
+python set_environment.py --force-test-db false
 ```
+
+---
 
 ### VS Code Integration
 
 Use the compound debugging configuration for all services:
 
 1. Open VS Code in project root
-2. Select "🚀 All Services (Development)" from debug configurations
+2. Select "All Services (Development)" from debug configurations
 3. Start debugging - all services launch with proper environment isolation
 
 ## Background
