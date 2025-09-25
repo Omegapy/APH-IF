@@ -1,4 +1,4 @@
-# APH-IF Data Processing Service
+# APH-IF Data Processing Service Alpha Version 0.1.0
 
 The data processing service provides comprehensive document ingestion, hybrid knowledge graph construction, and relationship discovery for the APH-IF system. It creates the foundational hybrid store combining GraphRAG and VectorRAG capabilities.
 
