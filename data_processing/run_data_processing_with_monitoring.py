@@ -110,16 +110,49 @@ except ImportError as e:
     sys.exit(1)
 
 # Local application/library specific imports
+# Try to import common modules, but provide fallbacks if not available
+MONITORING_AVAILABLE = True
 try:
     from common.api_monitor import LogLevel, configure_monitoring  # API monitoring utilities
     from common.monitoring_dashboard import MonitoringDashboard, generate_monitoring_report  # Dashboard and reporting
 except ImportError as e:
-    print(f"Error: Could not import required modules: {e}")
-    print("Make sure you're running from the data_processing directory with UV.")
-    sys.exit(1)
+    MONITORING_AVAILABLE = False
+    print(f"⚠️ Advanced monitoring disabled: {e}")
+    print("   The script will continue with basic logging functionality.")
+    
+    # Lightweight fallback monitoring shims
+    class LogLevel:
+        """Lightweight LogLevel enum fallback when common package unavailable."""
+        MINIMAL = "minimal"
+        STANDARD = "standard"
+        DETAILED = "detailed"
+        DEBUG = "debug"
+    
+    def configure_monitoring(*args, **kwargs):
+        """No-op monitoring configuration when common package unavailable."""
+        return None
+    
+    class MonitoringDashboard:
+        """Lightweight MonitoringDashboard fallback when common package unavailable."""
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def start_monitoring(self):
+            pass
+        
+        def stop_monitoring(self):
+            pass
+        
+        def get_summary(self):
+            return {"status": "monitoring_disabled", "reason": "common package not available"}
+    
+    def generate_monitoring_report(*args, **kwargs):
+        """No-op monitoring report generation when common package unavailable."""
+        return {"status": "disabled", "message": "Advanced monitoring not available"}
 
-# Load environment variables from .env file
-load_dotenv(project_root / '.env')
+# Load environment variables from local data_processing/.env file
+data_processing_root = Path(__file__).parent
+load_dotenv(data_processing_root / '.env')
 
 
 # =========================================================================
@@ -194,13 +227,19 @@ def setup_monitoring(monitoring_dir: Path, log_level: LogLevel) -> tuple:
     monitoring_dir.mkdir(parents=True, exist_ok=True)
 
     # Configure global monitoring
-    llm_monitor, neo4j_monitor = configure_monitoring(log_level, monitoring_dir)
-
-    print(f"Monitoring configured:")
-    print(f"   Directory: {monitoring_dir}")
-    print(f"   Log Level: {log_level.value}")
-    print(f"   LLM Monitor: {monitoring_dir / 'llm_api_calls.jsonl'}")
-    print(f"   Neo4j Monitor: {monitoring_dir / 'neo4j_operations.jsonl'}")
+    if MONITORING_AVAILABLE:
+        llm_monitor, neo4j_monitor = configure_monitoring(log_level, monitoring_dir)
+        print(f"✅ Advanced monitoring configured:")
+        print(f"   Directory: {monitoring_dir}")
+        print(f"   Log Level: {log_level.value}")
+        print(f"   LLM Monitor: {monitoring_dir / 'llm_api_calls.jsonl'}")
+        print(f"   Neo4j Monitor: {monitoring_dir / 'neo4j_operations.jsonl'}")
+    else:
+        llm_monitor, neo4j_monitor = None, None
+        print(f"⚠️ Basic monitoring mode (common package unavailable):")
+        print(f"   Directory: {monitoring_dir}")
+        print(f"   Log Level: {log_level.value}")
+        print(f"   Advanced monitoring features disabled")
 
     return llm_monitor, neo4j_monitor
 # --------------------------------------------------------------------------------- end setup_monitoring()
@@ -348,47 +387,55 @@ def run_data_processing_pipeline(args) -> int:
         # Generate monitoring report
         if args.generate_report:
             print(f"\nGenerating Monitoring Report...")
-            report_path = monitoring_dir / f"pipeline_report_{start_time.strftime('%Y%m%d_%H%M%S')}.html"
+            if MONITORING_AVAILABLE:
+                report_path = monitoring_dir / f"pipeline_report_{start_time.strftime('%Y%m%d_%H%M%S')}.html"
 
-            success = generate_monitoring_report(
-                monitoring_dir=monitoring_dir,
-                output_path=report_path,
-                format='html'
-            )
+                success = generate_monitoring_report(
+                    monitoring_dir=monitoring_dir,
+                    output_path=report_path,
+                    format='html'
+                )
 
-            if success:
-                print(f"   Report generated: {report_path}")
+                if success:
+                    print(f"   Report generated: {report_path}")
+                else:
+                    print(f"   Failed to generate report")
             else:
-                print(f"   Failed to generate report")
+                print(f"⚠️ Report generation skipped (advanced monitoring unavailable)")
+                print(f"   Check basic logs in: {monitoring_dir}")
 
         # Show monitoring summary
         print(f"\nMonitoring Summary:")
-        try:
-            dashboard = MonitoringDashboard()
-            records_loaded = dashboard.load_data(monitoring_dir)
+        if MONITORING_AVAILABLE:
+            try:
+                dashboard = MonitoringDashboard()
+                records_loaded = dashboard.load_data(monitoring_dir)
 
-            if records_loaded > 0:
-                stats = dashboard.get_realtime_stats()
-                print(f"   Total API Calls: {stats['total_records']:,}")
-                print(f"   LLM Calls: {stats['llm_calls']:,}")
-                print(f"   Neo4j Operations: {stats['neo4j_operations']:,}")
-                print(f"   Success Rate: {stats['success_rate']:.1%}")
-                print(f"   Avg Duration: {stats['avg_duration_ms']:.1f}ms")
+                if records_loaded > 0:
+                    stats = dashboard.get_realtime_stats()
+                    print(f"   Total API Calls: {stats['total_records']:,}")
+                    print(f"   LLM Calls: {stats['llm_calls']:,}")
+                    print(f"   Neo4j Operations: {stats['neo4j_operations']:,}")
+                    print(f"   Success Rate: {stats['success_rate']:.1%}")
+                    print(f"   Avg Duration: {stats['avg_duration_ms']:.1f}ms")
 
-                # Generate quick analysis
-                report = dashboard.generate_comprehensive_report()
-                if report.error_analysis['total_errors'] > 0:
-                    print(f"   Errors Detected: {report.error_analysis['total_errors']}")
+                    # Generate quick analysis
+                    report = dashboard.generate_comprehensive_report()
+                    if report.error_analysis['total_errors'] > 0:
+                        print(f"   Errors Detected: {report.error_analysis['total_errors']}")
 
-                if report.recommendations:
-                    print(f"\nKey Recommendations:")
-                    for i, rec in enumerate(report.recommendations[:3], 1):
-                        print(f"   {i}. {rec}")
-            else:
-                print("   No monitoring data collected")
+                    if report.recommendations:
+                        print(f"\nKey Recommendations:")
+                        for i, rec in enumerate(report.recommendations[:3], 1):
+                            print(f"   {i}. {rec}")
+                else:
+                    print("   No advanced monitoring data collected")
 
-        except Exception as e:
-            print(f"   Error analyzing monitoring data: {e}")
+            except Exception as e:
+                print(f"   Error analyzing monitoring data: {e}")
+        else:
+            print("   Advanced monitoring unavailable (basic logging only)")
+            print(f"   Check pipeline output and logs in: {monitoring_dir}")
 
         return result.returncode
 

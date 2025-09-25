@@ -135,7 +135,7 @@ except Exception:  # pragma: no cover
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Default PDF directory inside the container (can be overridden via env)
-DEFAULT_PDF_DIR = os.getenv("PDF_DIR", "/app/data_pdf")
+DEFAULT_PDF_DIR = os.getenv("PDF_DIR", "/data/data_pdf")
 
 # Configure logging for hybrid store construction monitoring
 # Support verbose mode via VERBOSE environment variable
@@ -633,7 +633,12 @@ class HybridStoreBuilder:
                     return max(1, len(s.split()))
                 return len(enc.encode(s))
 
-            all_chunks: list[dict] = []
+            # Enhanced page tracking: Build page boundaries and full text
+            print("Building page mapping for enhanced tracking...")
+            page_boundaries = []  # [(page_num, start_char, end_char, text)]
+            full_text = ""
+            char_offset = 0
+            
             for page_idx in range(num_pages):
                 if self.max_pages_per_doc > 0 and (page_idx + 1) > self.max_pages_per_doc:
                     break
@@ -641,24 +646,95 @@ class HybridStoreBuilder:
                 page_text = page.extract_text() or ""
                 if not page_text.strip():
                     continue
-                page_chunks = self.text_splitter.split_text(page_text)
-                for j, chunk_text in enumerate(page_chunks, start=1):
-                    chunk = {
-                        "doc_id": filename,
-                        "chunk_id": f"{filename}_p{page_idx+1}_c{j}",
-                        "text": chunk_text,
-                        "page": page_idx + 1,
-                        "tokens": count_tokens(chunk_text),
-                        "title": filename,
-                        "source": "local",
-                    }
-                    all_chunks.append(chunk)
+                    
+                page_info = {
+                    'page_num': page_idx + 1,
+                    'start_char': char_offset,
+                    'end_char': char_offset + len(page_text),
+                    'text': page_text
+                }
+                page_boundaries.append(page_info)
+                
+                full_text += page_text
+                char_offset += len(page_text)
+            
+            if not full_text.strip():
+                print(f"[ERROR] No text extracted from {filename}")
+                return False
+                
+            print(f"Built page mapping: {len(page_boundaries)} pages, {len(full_text):,} total characters")
+            
+            # Chunk the entire document for semantic coherence
+            print("Creating semantic chunks across page boundaries...")
+            document_chunks = self.text_splitter.split_text(full_text)
+            
+            # Map chunks back to pages with enhanced tracking
+            all_chunks: list[dict] = []
+            chunk_offset = 0
+            
+            for chunk_idx, chunk_text in enumerate(document_chunks):
+                # Find chunk position in full text
+                chunk_start = full_text.find(chunk_text, chunk_offset)
+                if chunk_start == -1:
+                    # Fallback: search from beginning (should rarely happen)
+                    chunk_start = full_text.find(chunk_text)
+                chunk_end = chunk_start + len(chunk_text)
+                chunk_offset = chunk_start + 1  # For next search
+                
+                # Find which pages this chunk spans
+                pages_touched = []
+                start_page = None
+                end_page = None
+                
+                for page_info in page_boundaries:
+                    # Check if chunk overlaps with this page
+                    if chunk_start < page_info['end_char'] and chunk_end > page_info['start_char']:
+                        pages_touched.append(page_info['page_num'])
+                        if start_page is None:
+                            start_page = page_info['page_num']
+                        end_page = page_info['page_num']
+                
+                # Create chunk with enhanced page tracking
+                if not pages_touched:  # Fallback
+                    pages_touched = [1]
+                    start_page = end_page = 1
+                    
+                # Generate chunk ID based on primary page
+                primary_page = start_page or 1
+                chunk_id = f"{filename}_c{chunk_idx+1}_p{primary_page}"
+                if len(pages_touched) > 1:
+                    chunk_id += f"-{end_page}"
+                    
+                chunk = {
+                    "doc_id": filename,
+                    "chunk_id": chunk_id,
+                    "text": chunk_text,
+                    "page": primary_page,  # Backward compatibility
+                    "page_start": start_page,
+                    "page_end": end_page,
+                    "pages": pages_touched,
+                    "page_span": len(pages_touched),
+                    "tokens": count_tokens(chunk_text),
+                    "title": filename,
+                    "source": "local",
+                }
+                all_chunks.append(chunk)
 
             if not all_chunks:
                 print(f"[ERROR] No text extracted from {filename}")
                 return False
 
-            print(f"Created {len(all_chunks):,} chunks for hybrid processing")
+            print(f"Created {len(all_chunks):,} chunks with enhanced page tracking for hybrid processing")
+            
+            # Show page span statistics
+            single_page_chunks = sum(1 for ch in all_chunks if ch['page_span'] == 1)
+            multi_page_chunks = sum(1 for ch in all_chunks if ch['page_span'] > 1)
+            max_span = max(ch['page_span'] for ch in all_chunks) if all_chunks else 0
+            
+            print(f"   📄 Page tracking stats:")
+            print(f"      Single-page chunks: {single_page_chunks:,}")
+            print(f"      Multi-page chunks: {multi_page_chunks:,}")
+            print(f"      Max page span: {max_span}")
 
             # Process chunks in small batches
             batch_size = 10
@@ -687,7 +763,8 @@ class HybridStoreBuilder:
 MERGE (d:Document {doc_id: $doc_id})
   ON CREATE SET d.title=$title, d.source=$source, d.created_at=timestamp()
 MERGE (c:Chunk {chunk_id: $chunk_id})
-  ON CREATE SET c.text=$text, c.page=$page, c.tokens=$tokens, c.embedding=$embedding
+  ON CREATE SET c.text=$text, c.page=$page, c.page_start=$page_start, c.page_end=$page_end, 
+                c.pages=$pages, c.page_span=$page_span, c.tokens=$tokens, c.embedding=$embedding
 MERGE (d)-[:HAS_CHUNK]->(c)
 MERGE (c)-[:PART_OF]->(d)
                             """,
@@ -698,6 +775,10 @@ MERGE (c)-[:PART_OF]->(d)
                                 "chunk_id": ch["chunk_id"],
                                 "text": ch["text"],
                                 "page": ch["page"],
+                                "page_start": ch["page_start"],
+                                "page_end": ch["page_end"],
+                                "pages": ch["pages"],
+                                "page_span": ch["page_span"],
                                 "tokens": ch["tokens"],
                                 "embedding": chunk_embedding,
                             },

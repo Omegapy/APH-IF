@@ -13,7 +13,7 @@ The frontend service provides a Streamlit-based web interface for the Advanced P
 
 ```powershell
 # From project root
-cd frontend
+Set-Location frontend
 
 # Install dependencies
 uv sync
@@ -21,16 +21,6 @@ uv sync
 # Start the service
 uv run streamlit run app/bot.py --server.port 8501
 ```
-
-## Environment Display
-
-The frontend automatically displays the current environment configuration:
-
-- **🔧 DEVELOPMENT**: Green indicator - safe for development work
-- **🚨 PRODUCTION**: Red indicator - live data, use with caution
-- **⚠️ TEST**: Yellow indicator - testing database active
-
-The interface shows warnings when connected to production or test databases.
 
 ## User Interface
 
