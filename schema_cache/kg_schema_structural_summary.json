@@ -1,0 +1,273 @@
+{
+  "metadata": {
+    "generated_at": "2025-09-14T02:46:15.925251Z",
+    "neo4j_uri": "neo4j://127.0.0.1:7687",
+    "database": "neo4j",
+    "counts": {
+      "node_labels": 4,
+      "relationship_types": 4,
+      "node_property_rows": 16,
+      "relationship_property_rows": 9
+    },
+    "schema_manager_cache_timestamp": "2025-09-14T02:46:14.779072",
+    "version": 1
+  },
+  "node_labels": [
+    {
+      "label": "_Bloom_Perspective_"
+    },
+    {
+      "label": "Document"
+    },
+    {
+      "label": "Chunk"
+    },
+    {
+      "label": "Entity"
+    }
+  ],
+  "relationship_types": [
+    {
+      "type": "HAS_CHUNK"
+    },
+    {
+      "type": "PART_OF"
+    },
+    {
+      "type": "HAS_ENTITY"
+    },
+    {
+      "type": "RELATED_TO"
+    }
+  ],
+  "node_property_types": [
+    {
+      "labels": [
+        "Document"
+      ],
+      "property": "doc_id",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Document"
+      ],
+      "property": "title",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Document"
+      ],
+      "property": "source",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Document"
+      ],
+      "property": "created_at",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "chunk_id",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "text",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "page",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "tokens",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "embedding",
+      "types": [
+        "DoubleArray"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "page_start",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "page_end",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "pages",
+      "types": [
+        "LongArray"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "page_span",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Entity"
+      ],
+      "property": "name",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Entity"
+      ],
+      "property": "type",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Entity"
+      ],
+      "property": "display",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    }
+  ],
+  "relationship_property_types": [
+    {
+      "relationship_type": null,
+      "property": null,
+      "types": null,
+      "mandatory": false
+    },
+    {
+      "relationship_type": null,
+      "property": null,
+      "types": null,
+      "mandatory": false
+    },
+    {
+      "relationship_type": null,
+      "property": null,
+      "types": null,
+      "mandatory": false
+    },
+    {
+      "relationship_type": null,
+      "property": "source",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "created_at",
+      "types": [
+        "DateTime"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "rel_type",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "score",
+      "types": [
+        "Double"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "evidence_chunks",
+      "types": [
+        "StringArray"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "justification",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    }
+  ]
+}

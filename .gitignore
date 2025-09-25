@@ -1,0 +1,162 @@
+# =============================================================================
+# Environments & Secrets
+# Never commit sensitive data.
+# =============================================================================
+.env
+.env.*
+!.env.example
+secrets/
+secrets.toml
+*.key
+*.pem
+*.p12
+credentials.json
+.pypirc
+.streamlit/secrets.toml
+
+# =============================================================================
+# IDE & Editor Files
+# =============================================================================
+# Visual Studio Code
+.vscode/
+
+# JetBrains (PyCharm, etc.)
+.idea/
+
+# Other Editors
+*.swp
+*.swo
+.spyderproject
+.spyproject
+.ropeproject
+
+# =============================================================================
+# Python Caches & Compiled Files
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# =============================================================================
+# Virtual Environments
+# =============================================================================
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+
+# =============================================================================
+# Build, Distribution & Packaging Artifacts
+# =============================================================================
+build/
+dist/
+eggs/
+.eggs/
+downloads/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+
+# =============================================================================
+# Testing & Coverage Reports
+# =============================================================================
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.tox/
+.nox/
+coverage.xml
+nosetests.xml
+.hypothesis/
+
+# =============================================================================
+# Dependency Management
+# Lock files are often committed, but can be ignored in some library projects.
+# The original comments explaining each are preserved below.
+# =============================================================================
+# Pipenv
+Pipfile.lock
+
+# UV
+uv.lock
+
+# poetry
+# poetry.lock
+
+# pdm
+# pdm.lock
+
+# pixi
+# pixi.lock
+
+# =============================================================================
+# Framework & Library Specific
+# =============================================================================
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# =============================================================================
+# Documentation
+# =============================================================================
+docs/_build/
+site/
+
+# =============================================================================
+# OS & System Generated Files
+# =============================================================================
+.DS_Store
+Thumbs.db
+
+# =============================================================================
+# Project-Specific Ignores
+# Custom rules for the APH-IF project.
+# =============================================================================
+# Directories
+i-*/
+ex-*/
+docs/
+docs for AI/
+
+# Files at any depth
+**/i-*
+
+# Backups and temporary files
+*.backup
+*.bak
+*.orig
+.tmp/
+temp/
+
