@@ -65,10 +65,10 @@ import logging
 import time
 from dataclasses import dataclass
 from threading import Lock
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 from neo4j import Driver, GraphDatabase, Record
-from neo4j.exceptions import DatabaseError, ServiceUnavailable, TransientError
+from neo4j.exceptions import ServiceUnavailable, TransientError
 
 from .config import settings
 

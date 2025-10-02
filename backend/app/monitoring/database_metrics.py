@@ -58,20 +58,18 @@ monitoring endpoints without altering request behavior.
 
 from __future__ import annotations
 
-# __________________________________________________________________________
-# Imports
-
-import time
 import asyncio
 import logging
-from typing import Any, AsyncIterator, Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
-from contextlib import asynccontextmanager
 import statistics
-from datetime import datetime, timedelta
+
+# __________________________________________________________________________
+# Imports
+import time
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from typing import Any, AsyncIterator, Dict, List, Optional
 
 from .timing_collector import get_timing_collector
-from ..core.config import settings
 
 # __________________________________________________________________________
 # Global Constants / Variables
@@ -169,7 +167,7 @@ class DatabaseMetricsCollector:
             "last_reset_time": time.time(),
         }
         
-        logger.info(f"Database metrics collector initialized")
+        logger.info("Database metrics collector initialized")
     # --------------------------------------------------------------------------------- end __init__()
     
     # --------------------------------------------------------------------------------- measure_database_operation()
@@ -270,12 +268,11 @@ class DatabaseMetricsCollector:
             None: Use within an "async with" block to record compilation time.
         """
         start_time = time.perf_counter()
-        compilation_time_ms = 0.0
         
         try:
             yield
         finally:
-            compilation_time_ms = (time.perf_counter() - start_time) * 1000
+            (time.perf_counter() - start_time) * 1000
             # This will be set on the current operation timing if available
             # Implementation would need access to current timing context
     # --------------------------------------------------------------------------------- end measure_query_compilation()
@@ -360,7 +357,7 @@ class DatabaseMetricsCollector:
                 connection pool status, and basic query analysis.
         """
         # Filter operations by time window
-        cutoff_time = time.time() - (time_window_minutes * 60)
+        time.time() - (time_window_minutes * 60)
         recent_operations = [
             op for op in self._operation_history 
             if hasattr(op, 'timestamp') or True  # Simplified for now

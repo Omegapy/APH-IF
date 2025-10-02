@@ -66,11 +66,11 @@ import logging
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-from pydantic_settings import BaseSettings
-from pydantic import Field, model_validator
 from dotenv import load_dotenv
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings
 
 # Load environment variables from backend/.env
 # __________________________________________________________________________
@@ -164,154 +164,154 @@ class Settings(BaseSettings):
     #
     
     # Environment Configuration
-    app_env: str = Field(default="development", env="APP_ENV")
-    force_test_db: bool = Field(default=False, env="FORCE_TEST_DB")
-    verbose: bool = Field(default=True, env="VERBOSE")
-    debug: bool = Field(default=True, env="DEBUG")
+    app_env: str = Field(default="development", validation_alias="APP_ENV")
+    force_test_db: bool = Field(default=False, validation_alias="FORCE_TEST_DB")
+    verbose: bool = Field(default=True, validation_alias="VERBOSE")
+    debug: bool = Field(default=True, validation_alias="DEBUG")
     
     # Service Configuration
-    host: str = Field(default="127.0.0.1", env="HOST")
-    port: int = Field(default=8000, env="PORT")
-    backend_url: str = Field(default="http://localhost:8000", env="BACKEND_URL")
-    data_processing_url: str = Field(default="http://localhost:8010", env="DATA_PROCESSING_URL")
-    frontend_url: str = Field(default="http://localhost:8501", env="FRONTEND_URL")
+    host: str = Field(default="127.0.0.1", validation_alias="HOST")
+    port: int = Field(default=8000, validation_alias="PORT")
+    backend_url: str = Field(default="http://localhost:8000", validation_alias="BACKEND_URL")
+    data_processing_url: str = Field(default="http://localhost:8010", validation_alias="DATA_PROCESSING_URL")
+    frontend_url: str = Field(default="http://localhost:8501", validation_alias="FRONTEND_URL")
     
     # Neo4j Database Configuration
-    neo4j_uri: str = Field(..., env="NEO4J_URI")
-    neo4j_username: str = Field(..., env="NEO4J_USERNAME")
-    neo4j_password: str = Field(..., env="NEO4J_PASSWORD")
-    neo4j_database: str = Field(default="neo4j", env="NEO4J_DATABASE")
+    neo4j_uri: str = Field(..., validation_alias="NEO4J_URI")
+    neo4j_username: str = Field(..., validation_alias="NEO4J_USERNAME")
+    neo4j_password: str = Field(..., validation_alias="NEO4J_PASSWORD")
+    neo4j_database: str = Field(default="neo4j", validation_alias="NEO4J_DATABASE")
     
     
     # OpenAI Configuration
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
-    openai_model_mini: str = Field(default="gpt-5-mini", env="OPENAI_MODEL_MINI")
-    openai_max_tokens: int = Field(default=6000, env="OPENAI_MAX_TOKENS")
-    openai_temperature: float = Field(default=1.0, env="OPENAI_TEMPERATURE")
+    openai_api_key: str = Field(..., validation_alias="OPENAI_API_KEY")
+    openai_model_mini: str = Field(default="gpt-5-mini", validation_alias="OPENAI_MODEL_MINI")
+    openai_max_tokens: int = Field(default=6000, validation_alias="OPENAI_MAX_TOKENS")
+    openai_temperature: float = Field(default=1.0, validation_alias="OPENAI_TEMPERATURE")
     
     # OpenAI Rate Limiting (Tier 3)
-    openai_requests_per_minute: int = Field(default=4500, env="OPENAI_REQUESTS_PER_MINUTE")
-    openai_tokens_per_minute: int = Field(default=3600000, env="OPENAI_TOKENS_PER_MINUTE")
+    openai_requests_per_minute: int = Field(default=4500, validation_alias="OPENAI_REQUESTS_PER_MINUTE")
+    openai_tokens_per_minute: int = Field(default=3600000, validation_alias="OPENAI_TOKENS_PER_MINUTE")
     
     # OpenAI Embedding Configuration
-    openai_embedding_model: str = Field(default="text-embedding-3-large", env="OPENAI_EMBEDDING_MODEL")
-    openai_embedding_dimensions: int = Field(default=3072, env="OPENAI_EMBEDDING_DIMENSIONS")
+    openai_embedding_model: str = Field(default="text-embedding-3-large", validation_alias="OPENAI_EMBEDDING_MODEL")
+    openai_embedding_dimensions: int = Field(default=3072, validation_alias="OPENAI_EMBEDDING_DIMENSIONS")
     
     # LLM Client Configuration
-    llm_timeout_seconds: int = Field(default=240, env="LLM_TIMEOUT_SECONDS")
-    llm_max_retries: int = Field(default=3, env="LLM_MAX_RETRIES")
-    llm_rate_limit_buffer_percent: float = Field(default=0.9, env="LLM_RATE_LIMIT_BUFFER_PERCENT")
-    fusion_parallel_preprocessing: bool = Field(default=True, env="FUSION_PARALLEL_PREPROCESSING")
+    llm_timeout_seconds: int = Field(default=240, validation_alias="LLM_TIMEOUT_SECONDS")
+    llm_max_retries: int = Field(default=3, validation_alias="LLM_MAX_RETRIES")
+    llm_rate_limit_buffer_percent: float = Field(default=0.9, validation_alias="LLM_RATE_LIMIT_BUFFER_PERCENT")
+    fusion_parallel_preprocessing: bool = Field(default=True, validation_alias="FUSION_PARALLEL_PREPROCESSING")
     
     
     # Confidence Scoring Configuration
     traversal_confidence_cap: float = Field(
-        default=1.0, env="TRAVERSAL_CONFIDENCE_CAP",
+        default=1.0, validation_alias="TRAVERSAL_CONFIDENCE_CAP",
         description="Maximum confidence score for graph traversal searches (0.0-1.0)"
     )
     semantic_confidence_cap: float = Field(
-        default=1.0, env="SEMANTIC_CONFIDENCE_CAP",
+        default=1.0, validation_alias="SEMANTIC_CONFIDENCE_CAP",
         description="Maximum confidence score for semantic/vector searches (0.0-1.0)"
     )
     fusion_confidence_cap: float = Field(
-        default=1.0, env="FUSION_CONFIDENCE_CAP",
+        default=1.0, validation_alias="FUSION_CONFIDENCE_CAP",
         description="Maximum confidence score for fused results (0.0-1.0)"
     )
     
     
     # Schema-aware Semantic Search Configuration
     semantic_use_structural_schema: bool = Field(
-        default=True, env="SEMANTIC_USE_STRUCTURAL_SCHEMA",
+        default=True, validation_alias="SEMANTIC_USE_STRUCTURAL_SCHEMA",
         description="Enable schema-aware mode that augments semantic search prompts with structural schema context"
     )
     semantic_schema_token_budget: int = Field(
-        default=2500, env="SEMANTIC_SCHEMA_TOKEN_BUDGET",
+        default=2500, validation_alias="SEMANTIC_SCHEMA_TOKEN_BUDGET",
         description="Token budget for schema context segment in semantic search prompts"
     )
     semantic_schema_max_items: int = Field(
-        default=15, env="SEMANTIC_SCHEMA_MAX_ITEMS",
+        default=15, validation_alias="SEMANTIC_SCHEMA_MAX_ITEMS",
         description="Maximum number of node labels/relationships to include in schema context"
     )
     
     # Citation Validation and Domain Enforcement Configuration
     semantic_citation_validation: bool = Field(
-        default=True, env="SEMANTIC_CITATION_VALIDATION",
+        default=True, validation_alias="SEMANTIC_CITATION_VALIDATION",
         description="Enable validation and cleanup of unmatched inline citations in semantic search"
     )
     semantic_domain_enforcement: bool = Field(
-        default=True, env="SEMANTIC_DOMAIN_ENFORCEMENT",
+        default=True, validation_alias="SEMANTIC_DOMAIN_ENFORCEMENT",
         description="Enable automatic insertion of domain-specific markers (legal, academic, etc.) from source content"
     )
     semantic_domain_markers_per_ref: int = Field(
-        default=2, env="SEMANTIC_DOMAIN_MARKERS_PER_REF",
+        default=2, validation_alias="SEMANTIC_DOMAIN_MARKERS_PER_REF",
         description="Maximum number of domain markers to extract and use per reference"
     )
     
     # Schema Export Configuration
     schema_export_enabled: bool = Field(
-        default=True, env="SCHEMA_EXPORT_ENABLED",
+        default=True, validation_alias="SCHEMA_EXPORT_ENABLED",
         description="Enable automatic structural schema export to JSON"
     )
     schema_export_filename: str = Field(
-        default="kg_schema_structural_summary.json", env="SCHEMA_EXPORT_FILENAME",
+        default="kg_schema_structural_summary.json", validation_alias="SCHEMA_EXPORT_FILENAME",
         description="Filename for structural schema export"
     )
     
     # LLM Structural Cypher Configuration
     use_llm_structural_cypher: bool = Field(
-        default=True, env="USE_LLM_STRUCTURAL_CYPHER",
+        default=True, validation_alias="USE_LLM_STRUCTURAL_CYPHER",
         description="Enable LLM-powered natural language to Cypher generation using structural schema"
     )
     llm_cypher_max_hops: int = Field(
-        default=3, env="LLM_CYPHER_MAX_HOPS",
+        default=3, validation_alias="LLM_CYPHER_MAX_HOPS",
         description="Maximum allowed relationship hops in generated Cypher queries"
     )
     llm_cypher_force_limit: int = Field(
-        default=50, env="LLM_CYPHER_FORCE_LIMIT",
+        default=50, validation_alias="LLM_CYPHER_FORCE_LIMIT",
         description="Default LIMIT value to inject if missing in generated queries"
     )
     llm_cypher_allow_call: bool = Field(
-        default=False, env="LLM_CYPHER_ALLOW_CALL",
+        default=False, validation_alias="LLM_CYPHER_ALLOW_CALL",
         description="Whether to allow CALL procedures in generated queries (dangerous)"
     )
     llm_cypher_examples_enabled: bool = Field(
-        default=True, env="LLM_CYPHER_EXAMPLES_ENABLED",
+        default=True, validation_alias="LLM_CYPHER_EXAMPLES_ENABLED",
         description="Include few-shot examples in Cypher generation prompts"
     )
     llm_cypher_prompt_token_budget: int = Field(
-        default=4500, env="LLM_CYPHER_PROMPT_TOKEN_BUDGET",
+        default=4500, validation_alias="LLM_CYPHER_PROMPT_TOKEN_BUDGET",
         description="Maximum tokens allocated for Cypher generation prompts"
     )
     
     # LLM Structural Narrative Configuration
     llm_structural_narrative_enabled: bool = Field(
-        default=True, env="LLM_STRUCTURAL_NARRATIVE_ENABLED",
+        default=True, validation_alias="LLM_STRUCTURAL_NARRATIVE_ENABLED",
         description="Enable LLM-powered narrative summarization from KG results"
     )
     llm_structural_narrative_token_budget: int = Field(
-        default=3500, env="LLM_STRUCTURAL_NARRATIVE_TOKEN_BUDGET",
+        default=3500, validation_alias="LLM_STRUCTURAL_NARRATIVE_TOKEN_BUDGET",
         description="Token budget for narrative summarization prompts (input only)"
     )
     llm_structural_source_max: int = Field(
-        default=15, env="LLM_STRUCTURAL_SOURCE_MAX",
+        default=15, validation_alias="LLM_STRUCTURAL_SOURCE_MAX",
         description="Maximum result rows for numbered sources (selection, not truncation)"
     )
     llm_structural_preserve_numbers: bool = Field(
-        default=True, env="LLM_STRUCTURAL_PRESERVE_NUMBERS",
+        default=True, validation_alias="LLM_STRUCTURAL_PRESERVE_NUMBERS",
         description="Require LLM to preserve provided citation numbers exactly"
     )
     llm_structural_citation_validation: bool = Field(
-        default=True, env="LLM_STRUCTURAL_CITATION_VALIDATION",
+        default=True, validation_alias="LLM_STRUCTURAL_CITATION_VALIDATION",
         description="Validate and filter invented citations from LLM output"
     )
     llm_structural_relevance_threshold: float = Field(
-        default=0.2, env="LLM_STRUCTURAL_RELEVANCE_THRESHOLD",
+        default=0.2, validation_alias="LLM_STRUCTURAL_RELEVANCE_THRESHOLD",
         description="Minimum keyword overlap ratio for relevance check (0.0-1.0)"
     )
 
     # Domain-Aware Citations Configuration
     llm_domain_citation_enabled: bool = Field(
-        default=True, env="LLM_DOMAIN_CITATION_ENABLED",
+        default=True, validation_alias="LLM_DOMAIN_CITATION_ENABLED",
         description="Enable domain-aware citation extraction and rendering (legal, academic, technical, business, medical)"
     )
     

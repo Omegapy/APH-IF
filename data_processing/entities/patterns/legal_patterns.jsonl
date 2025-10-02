@@ -1,0 +1,9 @@
+{"label": "LEGAL_SECTION", "pattern": [{"TEXT": {"REGEX": "§"}}, {"IS_SPACE": true, "OP": "?"}, {"LIKE_NUM": true}, {"TEXT": "."}, {"LIKE_NUM": true}]}
+{"label": "CFR_PART", "pattern": [{"LOWER": "part"}, {"LIKE_NUM": true}]}
+{"label": "CFR_PART", "pattern": [{"LOWER": "part"}, {"LIKE_NUM": true}, {"TEXT": "."}, {"LIKE_NUM": true}]}
+{"label": "SUBPART", "pattern": [{"LOWER": "subpart"}, {"IS_UPPER": true, "LENGTH": 1}]}
+{"label": "SUBPART", "pattern": [{"LOWER": "subpart"}, {"IS_UPPER": true, "LENGTH": 2}]}
+{"label": "APPENDIX", "pattern": [{"LOWER": "appendix"}, {"IS_UPPER": true, "LENGTH": 1}]}
+{"label": "APPENDIX", "pattern": [{"LOWER": "appendix"}, {"IS_UPPER": true}, {"TEXT": "-"}, {"LIKE_NUM": true}]}
+{"label": "CFR_TITLE", "pattern": [{"LOWER": "title"}, {"LIKE_NUM": true}]}
+{"label": "LEGAL_SECTION", "pattern": [{"LIKE_NUM": true}, {"LOWER": "cfr"}, {"LIKE_NUM": true}]}

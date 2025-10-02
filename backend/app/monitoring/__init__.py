@@ -45,25 +45,25 @@ and circuit breaker functionality.
 # __________________________________________________________________________
 # Imports
 
-from .performance_monitor import (
-    get_performance_monitor,
-    performance_health_check,
-    initialize_monitor,
-)
-from .timing_collector import (
-    get_timing_collector,
-    initialize_timing_collector,
-    measure_operation,
-    get_timing_stats,
+from .circuit_breaker import (
+    circuit_breaker,
+    circuit_breaker_health_check,
+    get_circuit_breaker,
 )
 from .database_metrics import (
     get_database_metrics,
     initialize_database_metrics,
 )
-from .circuit_breaker import (
-    get_circuit_breaker,
-    circuit_breaker,
-    circuit_breaker_health_check,
+from .performance_monitor import (
+    get_performance_monitor,
+    initialize_monitor,
+    performance_health_check,
+)
+from .timing_collector import (
+    get_timing_collector,
+    get_timing_stats,
+    initialize_timing_collector,
+    measure_operation,
 )
 
 __all__ = [

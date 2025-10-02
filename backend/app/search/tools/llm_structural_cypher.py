@@ -63,32 +63,29 @@ comprehensive validation against full schema for safety and correctness.
 from __future__ import annotations
 
 import asyncio
-import time
 import logging
 import re
-from typing import Dict, Any, List, Optional, Tuple
-from dataclasses import dataclass, field
-from datetime import datetime
+import time
+from dataclasses import dataclass
 from threading import Lock
+from typing import Any, Dict, List, Optional, Tuple
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
+from ...core.async_llm_client import AsyncLLMClient, get_async_llm_client
 from ...core.config import settings
-from ...core.async_llm_client import get_async_llm_client, AsyncLLMClient
 from ...schema.schema_manager import get_schema_manager
 from ...schema.schema_models import CompleteKGSchema
+from .cypher_validator import ValidationReport, get_cypher_validator
 from .prompts.structural_cypher import (
-    get_structural_cypher_prompt_builder, 
     PromptComponents,
+    get_structural_cypher_prompt_builder,
     get_structural_narrative_prompt_builder,
-    NarrativePromptComponents
 )
-from .cypher_validator import get_cypher_validator, ValidationReport
 
 # Import observability components
 try:
     from ...monitoring.timing_collector import get_timing_collector
-    from ...monitoring.circuit_breaker import CircuitBreaker
     OBSERVABILITY_AVAILABLE = True
 except ImportError:
     OBSERVABILITY_AVAILABLE = False
@@ -258,7 +255,7 @@ class LLMStructuralCypherEngine:
         # Configuration
         self.enabled = getattr(settings, 'use_llm_structural_cypher', True)
         
-        self.logger.info(f"LLM Structural Cypher Engine initialized")
+        self.logger.info("LLM Structural Cypher Engine initialized")
     # --------------------------------------------------------------------------------- end __init__()
     
     # -------------------------------------------------------------- _get_llm_client()
@@ -665,7 +662,7 @@ class LLMStructuralCypherEngine:
                         generated.reasoning or "Unknown generation error",
                         int((time.time() - start_time) * 1000)
                     )
-            except Exception as e:
+            except Exception:
                 raise
             
             # Step 2: Validate generated Cypher
@@ -679,7 +676,7 @@ class LLMStructuralCypherEngine:
                         f"Generated query failed validation with {len(validation_report.issues)} issues.",
                         int((time.time() - start_time) * 1000)
                     )
-            except Exception as e:
+            except Exception:
                 raise
             
             # Step 3: Execute validated Cypher
@@ -693,7 +690,7 @@ class LLMStructuralCypherEngine:
                         execution_result.error_message or "Unknown execution error",
                         int((time.time() - start_time) * 1000)
                     )
-            except Exception as e:
+            except Exception:
                 raise
             
             # Step 4: Format response
@@ -795,7 +792,6 @@ class LLMStructuralCypherEngine:
                 citations_in_answer = re.findall(r'\[(\d+)\]', answer)
                 occurrences_in_answer = len(citations_in_answer)
                 unique_in_answer = len(set(citations_in_answer))
-                used_refs = unique_in_answer
 
                 # Guard: If references exist but no inline citations in body, treat as unrelated
                 if len(document_refs) > 0 and inline_citation_count == 0:
@@ -821,7 +817,6 @@ class LLMStructuralCypherEngine:
                 # This branch is no longer reachable due to early return above
                 answer = ""
                 document_refs = []
-                used_refs = 0
                 narrative_used = False
                 citation_count = 0
                 occurrences_in_answer = 0

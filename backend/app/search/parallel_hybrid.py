@@ -64,15 +64,13 @@ Key Innovation: True parallel execution vs sequential conditional routing
 from __future__ import annotations
 
 import asyncio
-import time
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+import time
 from dataclasses import dataclass, field
-from datetime import datetime
+from typing import Any, Dict, List, Optional
 
- # __________________________________________________________________________
- # Imports
-
+# __________________________________________________________________________
+# Imports
 from ..core.config import settings
 
  # __________________________________________________________________________
@@ -348,7 +346,7 @@ class ParallelRetrievalEngine:
         
         # Initialize circuit breakers for resilience
         try:
-            from ..monitoring.circuit_breaker import get_circuit_breaker, CircuitBreakerConfig
+            from ..monitoring.circuit_breaker import CircuitBreakerConfig, get_circuit_breaker
             
             # Circuit breaker for semantic search
             semantic_config = CircuitBreakerConfig(
@@ -762,7 +760,7 @@ class ParallelRetrievalEngine:
                     query, max_results=max_results
                 )
             
-            self.logger.info(f"✅ LLM Structural Cypher completed successfully")
+            self.logger.info("✅ LLM Structural Cypher completed successfully")
             
         except Exception as e:
             self.logger.error(f"❌ LLM Structural Cypher failed: {str(e)}")
@@ -1092,7 +1090,7 @@ class ParallelRetrievalEngine:
         if self._semantic_search_available:
             try:
                 # Quick test of semantic search
-                test_result = await self._search_semantic_detailed("test query", k=1)
+                await self._search_semantic_detailed("test query", k=1)
                 health_status["components"]["semantic_search"] = "healthy"
             except Exception as e:
                 health_status["components"]["semantic_search"] = f"error: {str(e)}"
@@ -1103,7 +1101,7 @@ class ParallelRetrievalEngine:
         if self._traversal_llm_available:
             try:
                 # Quick test of LLM structural path
-                test_result = await self._query_knowledge_graph_llm_structural_detailed(
+                await self._query_knowledge_graph_llm_structural_detailed(
                     "test query", max_results=1
                 )
                 
@@ -1332,14 +1330,14 @@ async def test_parallel_retrieval_engine():
         
         # Test 4: Individual result analysis
         logger.info("\n📊 Test 4: Individual Result Analysis")
-        logger.info(f"Semantic Result:")
+        logger.info("Semantic Result:")
         logger.info(f"  Content length: {len(parallel_result.semantic_result.content)} chars")
         logger.info(f"  Confidence: {parallel_result.semantic_result.confidence:.2f}")
         logger.info(f"  Response time: {parallel_result.semantic_result.response_time_ms}ms")
         logger.info(f"  Citations: {len(parallel_result.semantic_result.citations)}")
         logger.info(f"  Entities: {len(parallel_result.semantic_result.entities)}")
         
-        logger.info(f"Traversal Result:")
+        logger.info("Traversal Result:")
         logger.info(f"  Content length: {len(parallel_result.traversal_result.content)} chars")
         logger.info(f"  Confidence: {parallel_result.traversal_result.confidence:.2f}")
         logger.info(f"  Response time: {parallel_result.traversal_result.response_time_ms}ms")

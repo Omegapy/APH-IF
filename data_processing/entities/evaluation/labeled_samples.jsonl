@@ -1,0 +1,5 @@
+{"text": "Requirements in §75.1714-1 and Part 75 must be followed.", "entities": [{"text": "§75.1714-1", "type": "LEGAL_SECTION"}, {"text": "Part 75", "type": "CFR_PART"}]}
+{"text": "See Subpart D and Appendix A for details.", "entities": [{"text": "Subpart D", "type": "SUBPART"}, {"text": "Appendix A", "type": "APPENDIX"}]}
+{"text": "Compliance with 30 CFR 57.4361(a) is mandatory.", "entities": [{"text": "30 CFR 57.4361(a)", "type": "LEGAL_SECTION"}]}
+{"text": "Title 30 regulations apply to mining operations.", "entities": [{"text": "Title 30", "type": "CFR_TITLE"}]}
+{"text": "Equipment must meet ISO 9001 standards.", "entities": [{"text": "ISO 9001", "type": "STANDARD"}]}

@@ -52,20 +52,20 @@ monitoring, and advanced prompt handling for the APH-IF backend.
 
 # __________________________________________________________________________
 # Imports
-import logging
 import asyncio
+import logging
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Union
-from dataclasses import dataclass, field
 from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 import openai
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI, OpenAI
 from openai.types.chat import ChatCompletion
 
-from .config import settings, LLM_MODEL_CONFIG, EMBEDDING_CONFIG, EFFECTIVE_RPM, EFFECTIVE_TPM
 from ..monitoring.timing_collector import get_timing_collector
+from .config import EFFECTIVE_RPM, EFFECTIVE_TPM, EMBEDDING_CONFIG, LLM_MODEL_CONFIG, settings
 
 logger = logging.getLogger(__name__)
 
@@ -589,7 +589,7 @@ async def validate_client_setup() -> Dict[str, Any]:
         validation["model_info"]["primary"] = client.model
 
         # Test minimal API call
-        response = await client.chat_completion(
+        await client.chat_completion(
             messages=[{"role": "user", "content": "OK"}]
         )
         validation["api_connection"] = True

@@ -60,17 +60,16 @@ from __future__ import annotations
 
 # __________________________________________________________________________
 # Imports
-
 from typing import Any, Dict, List, Optional
-from ...models.structured_responses import (
-    EngineMetadata, 
-    ConfidenceMetadata,
-    SemanticResultPayload,
-    TraversalResultPayload, 
-    FusionResultPayload
-)
-from ...core.config import settings
 
+from ...core.config import settings
+from ...models.structured_responses import (
+    ConfidenceMetadata,
+    EngineMetadata,
+    FusionResultPayload,
+    SemanticResultPayload,
+    TraversalResultPayload,
+)
 
 # __________________________________________________________________________
 # Standalone Function Definitions

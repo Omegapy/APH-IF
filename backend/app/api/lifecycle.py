@@ -151,16 +151,16 @@ def register_startup(app: FastAPI) -> None:
 
         try:
             from ..core.async_llm_client import get_async_llm_client
-            from ..processing.citation_processor import get_citation_processor
             from ..core.cpu_pool import get_cpu_pool
+            from ..processing.citation_processor import get_citation_processor
 
-            llm_client = await get_async_llm_client()
+            _ = await get_async_llm_client()  # Initialize singleton
             logger.info("✅ Async LLM client initialized")
 
-            citation_processor = get_citation_processor()
+            _ = get_citation_processor()  # Initialize singleton
             logger.info("✅ Citation processor initialized")
 
-            cpu_pool = get_cpu_pool()
+            _ = get_cpu_pool()  # Initialize singleton
             logger.info("✅ CPU pool started")
         except Exception as exc:  # noqa: BLE001 - log initialization issues
             logger.warning("⚠️ Some optimization components failed to initialize: %s", exc)
@@ -298,8 +298,8 @@ def register_shutdown(app: FastAPI) -> None:
 
         try:
             from ..core.async_llm_client import shutdown_async_llm_client
-            from ..processing.citation_processor import shutdown_citation_processor
             from ..core.cpu_pool import shutdown_cpu_pool
+            from ..processing.citation_processor import shutdown_citation_processor
 
             await shutdown_async_llm_client()
             logger.info("✅ Async LLM client shutdown")

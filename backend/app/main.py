@@ -64,6 +64,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from .api import state as api_state
 from .api.lifecycle import register_shutdown, register_startup
 from .api.routers import (

@@ -10,5 +10,5 @@ with Intelligent Fusion (APH-IF) for concurrent vector and graph search operatio
 Licensed under the Apache License, Version 2.0
 """
 
-__version__ = "Alpha 0.1.0"
+__version__ = "0.1.0"
 __author__ = "Alexander Samuel Ricciardi"

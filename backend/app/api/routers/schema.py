@@ -62,8 +62,10 @@ state, request refreshes, and generate summaries for LLM consumption.
 # Imports
 
 from __future__ import annotations
+
 import logging
 from typing import Any
+
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 

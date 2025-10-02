@@ -61,8 +61,8 @@ from typing import Any
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from app.api.utils import get_traversal_k
 from app.api.models import QueryRequest
+from app.api.utils import get_traversal_k
 
 logger = logging.getLogger("app.main")
 

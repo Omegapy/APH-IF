@@ -54,18 +54,16 @@ minimal overhead, and automatic timing breakdown for performance optimization.
 # __________________________________________________________________________
 # Imports
 
-import asyncio
+import logging
+import threading
 import time
 import uuid
-import logging
-from typing import Dict, List, Any, Optional, Set
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
 from collections import defaultdict
-import threading
-from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from .performance_monitor import TimingContext, DetailedTimingBreakdown
+from .performance_monitor import DetailedTimingBreakdown, TimingContext
 
 logger = logging.getLogger(__name__)
 

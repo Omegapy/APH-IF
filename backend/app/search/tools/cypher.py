@@ -64,11 +64,9 @@ historical context, plus helpers for formatting schema summaries.
 from __future__ import annotations
 
 import logging
-import time
-import asyncio
-from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -417,10 +415,10 @@ def format_schema_summary(schema: KnowledgeGraphSchema) -> str:
         Multiline text summarizing counts, label/type highlights, and properties.
     """
     summary_lines = [
-        f"=== Knowledge Graph Schema Summary ===",
+        "=== Knowledge Graph Schema Summary ===",
         f"Retrieved at: {schema.retrieved_at}",
-        f"",
-        f"📊 Overview:",
+        "",
+        "📊 Overview:",
         f"  • Total Nodes: {schema.total_nodes or 'Unknown'}",
         f"  • Total Relationships: {schema.total_relationships or 'Unknown'}",
         f"  • Node Labels: {len(schema.node_labels)}",
@@ -428,8 +426,8 @@ def format_schema_summary(schema: KnowledgeGraphSchema) -> str:
         f"  • Property Keys: {len(schema.property_keys)}",
         f"  • Constraints: {len(schema.constraints)}",
         f"  • Indexes: {len(schema.indexes)}",
-        f"",
-        f"🏷️ Node Labels:",
+        "",
+        "🏷️ Node Labels:",
     ]
     
     for node in schema.node_labels[:10]:  # Limit to first 10
@@ -444,8 +442,8 @@ def format_schema_summary(schema: KnowledgeGraphSchema) -> str:
         summary_lines.append(f"  ... and {len(schema.node_labels) - 10} more labels")
     
     summary_lines.extend([
-        f"",
-        f"🔗 Relationship Types:",
+        "",
+        "🔗 Relationship Types:",
     ])
     
     for rel in schema.relationship_types[:10]:  # Limit to first 10

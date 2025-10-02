@@ -68,10 +68,10 @@ and intelligently truncates structural schema summaries based on query relevance
 
 from __future__ import annotations
 
-import re
 import logging
-from typing import Any, Callable, Dict, List, Optional, Tuple
+import re
 from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional
 
 # __________________________________________________________________________
 # Global Constants / Variables
@@ -117,54 +117,54 @@ def safe_lower(value: Any) -> str:
 # =========================================================================
 
 FEW_SHOT_EXAMPLES = [
-    {
-        "description": "Chunk/Entity keyword search (chunk-pivot, citations)",
-        "user_query": "Find content about machine learning",
-        "cypher": (
-            "MATCH (c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
-            "WHERE toLower(c.text) CONTAINS 'machine learning' OR toLower(e.name) CONTAINS 'machine learning'\n"
-            "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
-            "LIMIT 10"
-        )
-    },
-    {
-        "description": "Entities mentioned in a document (return chunks for citations)", 
-        "user_query": "What entities are mentioned in document 'doc123'?",
-        "cypher": (
-            "MATCH (d:Document {doc_id: 'doc123'})-[:HAS_CHUNK]->(c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
-            "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
-            "LIMIT 20"
-        )
-    },
-    {
-        "description": "Entity→Entity expansion to discover related chunks (up to 3 hops)",
-        "user_query": "Find content related to entities connected to 'artificial intelligence'",
-        "cypher": (
-            "MATCH (e1:Entity {name: 'artificial intelligence'})-[:RELATED_TO*0..3]->(e2:Entity)<-[:HAS_ENTITY]-(c:Chunk)\n"
-            "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
-            "LIMIT 15"
-        )
-    },
-    {
-        "description": "Chunk search with citation data",
-        "user_query": "Find text chunks about machine learning",
-        "cypher": (
-            "MATCH (c:Chunk) WHERE toLower(c.text) CONTAINS 'machine learning'\n"
-            "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
-            "LIMIT 10"
-        )
-    },
-    {
-        "description": "Chunks for a specific entity type or name",
-        "user_query": "Show chunks that mention regulations",
-        "cypher": (
-            "MATCH (c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
-            "WHERE toLower(e.name) CONTAINS 'regulation' OR toLower(e.type) = 'regulation'\n"
-            "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
-            "LIMIT 25"
-        )
-    },
-    {
+    # {
+    #     "description": "Chunk/Entity keyword search (chunk-pivot, citations)",
+    #     "user_query": "Find content about machine learning",
+    #     "cypher": (
+    #         "MATCH (c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
+    #         "WHERE toLower(c.text) CONTAINS 'machine learning' OR toLower(e.name) CONTAINS 'machine learning'\n"
+    #         "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
+    #         "LIMIT 10"
+    #     )
+    # },
+    # {
+    #     "description": "Entities mentioned in a document (return chunks for citations)", 
+    #     "user_query": "What entities are mentioned in document 'doc123'?",
+    #     "cypher": (
+    #         "MATCH (d:Document {doc_id: 'doc123'})-[:HAS_CHUNK]->(c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
+    #         "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
+    #         "LIMIT 20"
+    #     )
+    # },
+    # {
+    #     "description": "Entity→Entity expansion to discover related chunks (up to 3 hops)",
+    #     "user_query": "Find content related to entities connected to 'artificial intelligence'",
+    #     "cypher": (
+    #         "MATCH (e1:Entity {name: 'artificial intelligence'})-[:RELATED_TO*0..3]->(e2:Entity)<-[:HAS_ENTITY]-(c:Chunk)\n"
+    #         "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
+    #         "LIMIT 15"
+    #     )
+    # },
+    # {
+    #     "description": "Chunk search with citation data",
+    #     "user_query": "Find text chunks about machine learning",
+    #     "cypher": (
+    #         "MATCH (c:Chunk) WHERE toLower(c.text) CONTAINS 'machine learning'\n"
+    #         "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
+    #         "LIMIT 10"
+    #     )
+    # },
+    # {
+    #     "description": "Chunks for a specific entity type or name",
+    #     "user_query": "Show chunks that mention regulations",
+    #     "cypher": (
+    #         "MATCH (c:Chunk)-[:HAS_ENTITY]->(e:Entity)\n"
+    #         "WHERE toLower(e.name) CONTAINS 'regulation' OR toLower(e.type) = 'regulation'\n"
+    #         "RETURN c.text, c.chunk_id AS chunk_id, c.page AS page\n"
+    #         "LIMIT 25"
+    #     )
+    # },
+     {
         "description": "Recall-first: phrase + stems with 0..1 hop expansion and UNION",
         "user_query": "Explain environmental monitoring procedures",
         "cypher": (
@@ -542,7 +542,7 @@ class StructuralCypherPromptBuilder:
                     current_tokens += rel_tokens
             
             # Add properties with remaining budget
-            remaining_tokens = available_tokens - current_tokens
+            available_tokens - current_tokens
             for prop in node_properties[:20]:  # Limit to top 20 most relevant
                 prop_tokens = self._estimate_element_tokens(prop)
                 if current_tokens + prop_tokens <= available_tokens:
@@ -713,7 +713,7 @@ class StructuralCypherPromptBuilder:
 # ------------------------------------------------------------------------- end class StructuralCypherPromptBuilder
 
 # =========================================================================
-# Narrative Summarization Prompt System
+# Narrative Prompt System
 # =========================================================================
 
 NARRATIVE_SYSTEM_PROMPT = """You are an expert knowledge synthesizer that composes authoritative answers from pre-numbered sources.
@@ -724,6 +724,11 @@ CRITICAL CITATION REQUIREMENTS:
 - Each [n] must correspond to a real source provided in the context
 - If unsure about a citation, omit it rather than guess
 - Do NOT add a References section - this will be added programmatically
+
+⚠️ ACRONYMS AND DEFINITIONS (STRICT):
+- Use the exact expansion from the sources on the FIRST mention: "Full Name (ACRONYM)".
+- Thereafter, use the acronym alone.
+- Never invent new expansions or alter the acronym letters.
 
 DOMAIN-SPECIFIC CITATION ENHANCEMENT:
 When sources contain recognizable domain identifiers, include them inline with citations:

@@ -117,7 +117,7 @@ class AsyncCitationProcessor:
     """
     
     # -------------------------------------------------------------- __init__()
-    def __init__(self, cache_ttl: int = 1800, max_cache_size: int = 500):
+    def __init__(self, cache_ttl: int = 1800, max_cache_size: int = 500) -> None:
         """
         Initialize the async citation processor.
         

@@ -1,0 +1,27 @@
+{
+  "legal_sections": [
+    "general provisions",
+    "definitions",
+    "scope and application",
+    "requirements",
+    "standards",
+    "enforcement",
+    "penalties",
+    "administrative procedures"
+  ],
+  "cfr_parts": [
+    "Part 75 Mandatory Safety Standards",
+    "Part 57 Safety and Health Standards",
+    "Part 48 Training and Retraining"
+  ],
+  "equipment_terms": [
+    "permissible equipment",
+    "approved equipment",
+    "certified equipment"
+  ],
+  "standards": [
+    "ISO 9001",
+    "ASTM D4318",
+    "ANSI Z87.1"
+  ]
+}

@@ -433,6 +433,7 @@ async def main() -> None:
     finally:
         print("\n🏁 Demo session ended")
 
+# --------------------------------------------------------------------------------- end main()
 
 # __________________________________________________________________________
 # Module Initialization / Main Execution Guard

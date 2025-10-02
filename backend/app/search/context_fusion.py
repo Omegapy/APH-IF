@@ -69,17 +69,16 @@ stage of the search pipeline and is used by API endpoints and the parallel retri
 from __future__ import annotations
 
 import asyncio
-import time
 import logging
 import re
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, field
+import time
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from ..core.config import settings
-from .parallel_hybrid import ParallelRetrievalResponse, FusionResult, RetrievalResult
+from .parallel_hybrid import FusionResult, ParallelRetrievalResponse, RetrievalResult
 
  # __________________________________________________________________________
  # Global Constants / Variables
@@ -127,15 +126,29 @@ CRITICAL CITATION REQUIREMENTS:
 - If sources conflict, present both perspectives with their respective citations
 - The References section will be added automatically - focus on preserving inline citations
 
-FUSION GUIDELINES:
-1. Identify complementary information from both sources
-2. Create a cohesive narrative that integrates both perspectives
-3. Resolve conflicts by presenting both viewpoints with source attribution
-4. Prioritize information based on confidence scores when conflicts arise
-5. Maintain domain-specific terminology and technical accuracy
-6. Preserve the specificity of regulatory/technical references
-7. Ensure the fused response is more comprehensive than either source alone
-8. Use clear section headers to organize complex information
+FUSION GUIDELINES (NOT A SUMMARY):
+1. Integrate content from BOTH sources with minimal connective text.
+2. Do NOT summarize, compress, or generalize. Do NOT write an overview.
+3. Preserve specific details (parentheticals, qualifiers, dates, sections, subparts).
+4. When two source statements align, merge them by placing them adjacently, not by rephrasing.
+5. Resolve conflicts by presenting both statements with their respective citations; do not reconcile by paraphrase.
+6. Maintain domain-specific terminology and technical accuracy at all times.
+7. Ensure the fused response is more comprehensive than either source alone by combining, not shortening.
+8. Prefer compact paragraphs. Avoid bullet lists unless both sources present the same items as lists; if a list is necessary, keep it short (≤3 bullets) and use exact item wording.
+
+TERMINOLOGY PRESERVATION (STRICT):
+- Use the exact vocabulary and phrases from the provided sources; avoid synonyms.
+- Preserve casing, hyphenation, punctuation, and numbering of technical terms and identifiers.
+- Do NOT generalize or simplify domain terms (e.g., keep "self-contained self-rescuer" if present; do not change to "respirator").
+- When a sentence or clause includes an inline citation like "[...] [n]", copy that clause from the source with minimal glue words. Do not paraphrase the clause attached to a citation.
+- If a term appears in the "TERMINOLOGY TO PRESERVE EXACTLY" list, use that exact string every time it appears.
+- Prefer quoting short exact phrases for precision rather than rewording them.
+- Only add minimal connective text to merge ideas; do not restate concepts with new vocabulary.
+
+⚠️ ACRONYMS AND DEFINITIONS (STRICT):
+- Use the exact expansion from the sources on the FIRST mention: "Full Name (ACRONYM)".
+- Thereafter, use the acronym alone, unless the source explicitly repeats the expansion.
+- Never invent new expansions or alter the acronym letters.
 
 RESPONSE STRUCTURE:
 - Start with a comprehensive overview
@@ -159,6 +172,12 @@ SEMANTIC SEARCH RESULTS (Confidence: {semantic_confidence:.2f}):
 
 GRAPH TRAVERSAL RESULTS (Confidence: {traversal_confidence:.2f}):
 {traversal_content}
+
+TERMINOLOGY TO PRESERVE EXACTLY:
+{terms_to_preserve_text}
+
+GLOSSARY OF ACRONYMS (EXACT - USE ON FIRST MENTION):
+{acronym_glossary_text}
 
 IMPORTANT FUSION INSTRUCTIONS:
 - Create a unified response that combines the best aspects of both sources
@@ -502,7 +521,7 @@ class IntelligentFusionEngine:
         
         # Initialize circuit breaker for LLM fusion with reduced timeouts
         try:
-            from ..monitoring.circuit_breaker import get_circuit_breaker, CircuitBreakerConfig
+            from ..monitoring.circuit_breaker import CircuitBreakerConfig, get_circuit_breaker
             
             fusion_config = CircuitBreakerConfig(
                 failure_threshold=3,
@@ -713,12 +732,64 @@ class IntelligentFusionEngine:
             # Create fusion messages
             system_message = SystemMessage(content=INTELLIGENT_FUSION_SYSTEM_PROMPT)
             
+            # Build a strict terminology preservation list from detected entities
+            try:
+                terms_to_preserve_list = list({
+                    *([t for t in (response.semantic_result.entities or []) if isinstance(t, str)]),
+                    *([t for t in (response.traversal_result.entities or []) if isinstance(t, str)])
+                })
+            except Exception:
+                terms_to_preserve_list = []
+
+            # Limit to avoid prompt bloat while keeping high-signal terms
+            if len(terms_to_preserve_list) > 50:
+                terms_to_preserve_list = terms_to_preserve_list[:50]
+
+            terms_to_preserve_text = "\n".join(f"- {term}" for term in terms_to_preserve_list) or "- (none)"
+
+            # Extract acronym expansions from source contents, preferring traversal definitions when duplicated
+            def _extract_acronyms(text: str) -> list[tuple[str, str]]:
+                # Match patterns like "Full Name (ACRONYM)" with 2-10 uppercase letters
+                pattern = r"([A-Za-z][A-Za-z0-9&\-.,'\/ ]{2,}?)\s*\(([A-Z]{2,10})\)"
+                try:
+                    matches = re.findall(pattern, text)
+                    results: list[tuple[str, str]] = []
+                    for full, acro in matches:
+                        full_clean = full.strip().strip('"\'')
+                        acro_clean = acro.strip()
+                        if 2 <= len(acro_clean) <= 10 and full_clean and acro_clean.isupper():
+                            results.append((acro_clean, full_clean))
+                    return results
+                except Exception:
+                    return []
+
+            traversal_acros = _extract_acronyms(response.traversal_result.content or "")
+            semantic_acros = _extract_acronyms(response.semantic_result.content or "")
+
+            # Prefer traversal definitions; then fill from semantic definitions
+            acro_map: dict[str, str] = {}
+            for acro, full in traversal_acros:
+                if acro not in acro_map:
+                    acro_map[acro] = full
+            for acro, full in semantic_acros:
+                if acro not in acro_map:
+                    acro_map[acro] = full
+
+            # Limit glossary size
+            if len(acro_map) > 50:
+                acro_items = list(acro_map.items())[:50]
+                acro_map = {k: v for k, v in acro_items}
+
+            acronym_glossary_text = "\n".join(f"- {full} ({acro})" for acro, full in acro_map.items()) or "- (none)"
+
             user_prompt = INTELLIGENT_FUSION_USER_PROMPT.format(
                 query=response.query,
                 semantic_confidence=response.semantic_result.confidence,
                 semantic_content=response.semantic_result.content,
                 traversal_confidence=response.traversal_result.confidence,
-                traversal_content=response.traversal_result.content
+                traversal_content=response.traversal_result.content,
+                terms_to_preserve_text=terms_to_preserve_text,
+                acronym_glossary_text=acronym_glossary_text,
             )
             
             user_message = HumanMessage(content=user_prompt)
@@ -876,7 +947,7 @@ class IntelligentFusionEngine:
             
             # Log citation preservation results
             if not semantic_preserved or not traversal_preserved:
-                self.logger.warning(f"Citation preservation issues detected:")
+                self.logger.warning("Citation preservation issues detected:")
                 self.logger.warning(f"Semantic missing: {semantic_missing}")
                 self.logger.warning(f"Traversal missing: {traversal_missing}")
             
@@ -1162,7 +1233,7 @@ async def test_context_fusion_engine():
     
     try:
         # Import required components for testing
-        from .parallel_hybrid import RetrievalResult, ParallelRetrievalResponse
+        from .parallel_hybrid import ParallelRetrievalResponse, RetrievalResult
         
         # Initialize fusion engine
         fusion_engine = get_fusion_engine()
@@ -1221,7 +1292,7 @@ async def test_context_fusion_engine():
         )
         
         # Test intelligent fusion strategy
-        logger.info(f"\n   Testing intelligent fusion...")
+        logger.info("\n   Testing intelligent fusion...")
         try:
             start_time = time.time()
             fusion_result = await fusion_engine.fuse_contexts(mock_parallel_response)

@@ -64,16 +64,15 @@ from __future__ import annotations
 
 # __________________________________________________________________________
 # Imports
-
 import asyncio
-import time
-import sys
-import multiprocessing as mp
 import logging
-from pathlib import Path
+import multiprocessing as mp
+import sys
+import time
 from concurrent.futures import ProcessPoolExecutor
-from typing import Dict, Any, Optional
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # __________________________________________________________________________
 # Global Constants / Variables
@@ -118,9 +117,7 @@ def run_semantic_search_process(query: str, k: int = 5) -> Dict[str, Any]:
         Dict[str, Any]: A serializable dictionary with search results and process metadata.
     """
     import asyncio
-    import sys
     import time
-    from pathlib import Path
     
     # Re-add path in subprocess (each process needs its own path setup)
     sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -192,9 +189,7 @@ def run_traversal_search_process(query: str, max_results: int = 20) -> Dict[str,
         Dict[str, Any]: A serializable dictionary with search results and process metadata.
     """
     import asyncio
-    import sys
     import time
-    from pathlib import Path
     
     # Re-add path in subprocess (each process needs its own path setup)
     sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -506,7 +501,7 @@ async def test_process_parallel() -> bool:
     result = await engine.retrieve_parallel_process(test_query)
     total_time = time.time() - start_time
     
-    print(f"\n📊 PROCESS PARALLEL RESULTS:")
+    print("\n📊 PROCESS PARALLEL RESULTS:")
     print(f"Total Time: {total_time:.2f}s")
     print(f"Success: {result['success']}")
     print(f"Both Successful: {result['both_successful']}")

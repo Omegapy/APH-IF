@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "generated_at": "2025-09-01T15:04:34.958418Z",
-    "neo4j_uri": "neo4j+s://93cd49de.databases.neo4j.io",
+    "generated_at": "2025-10-01T21:58:48.746385Z",
+    "neo4j_uri": "bolt://172.20.80.1:7687",
     "database": "neo4j",
     "counts": {
       "node_labels": 3,
-      "relationship_types": 4,
+      "relationship_types": 3,
       "node_property_rows": 16,
-      "relationship_property_rows": 9
+      "relationship_property_rows": 7
     },
-    "schema_manager_cache_timestamp": "2025-09-01T15:04:33.082137",
+    "schema_manager_cache_timestamp": "2025-10-01T21:58:47.070255",
     "version": 1
   },
   "node_labels": [
     {
-      "label": "Document"
+      "label": "Chunk"
     },
     {
-      "label": "Chunk"
+      "label": "Document"
     },
     {
       "label": "Entity"
@@ -26,9 +26,6 @@
   "relationship_types": [
     {
       "type": "HAS_CHUNK"
-    },
-    {
-      "type": "PART_OF"
     },
     {
       "type": "HAS_ENTITY"
@@ -42,7 +39,7 @@
       "labels": [
         "Document"
       ],
-      "property": "doc_id",
+      "property": "document_id",
       "types": [
         "String"
       ],
@@ -62,7 +59,7 @@
       "labels": [
         "Document"
       ],
-      "property": "source",
+      "property": "filename",
       "types": [
         "String"
       ],
@@ -74,97 +71,17 @@
       ],
       "property": "created_at",
       "types": [
-        "Long"
+        "DateTime"
       ],
       "mandatory": true
     },
     {
       "labels": [
-        "Chunk"
+        "Document"
       ],
-      "property": "chunk_id",
+      "property": "updated_at",
       "types": [
-        "String"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "text",
-      "types": [
-        "String"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "page",
-      "types": [
-        "Long"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "tokens",
-      "types": [
-        "Long"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "embedding",
-      "types": [
-        "DoubleArray"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "page_start",
-      "types": [
-        "Long"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "page_end",
-      "types": [
-        "Long"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "pages",
-      "types": [
-        "LongArray"
-      ],
-      "mandatory": true
-    },
-    {
-      "labels": [
-        "Chunk"
-      ],
-      "property": "page_span",
-      "types": [
-        "Long"
+        "DateTime"
       ],
       "mandatory": true
     },
@@ -192,9 +109,89 @@
       "labels": [
         "Entity"
       ],
-      "property": "display",
+      "property": "canonical_name",
       "types": [
         "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Entity"
+      ],
+      "property": "occurrences",
+      "types": [
+        "Long"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "embedding",
+      "types": [
+        "DoubleArray"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "document_id",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "updated_at",
+      "types": [
+        "DateTime"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "chunk_id",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "page",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "text",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "labels": [
+        "Chunk"
+      ],
+      "property": "tokens",
+      "types": [
+        "Long"
       ],
       "mandatory": true
     }
@@ -214,9 +211,27 @@
     },
     {
       "relationship_type": null,
-      "property": null,
-      "types": null,
-      "mandatory": false
+      "property": "updated_at",
+      "types": [
+        "DateTime"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "type",
+      "types": [
+        "String"
+      ],
+      "mandatory": true
+    },
+    {
+      "relationship_type": null,
+      "property": "confidence",
+      "types": [
+        "Double"
+      ],
+      "mandatory": true
     },
     {
       "relationship_type": null,
@@ -228,39 +243,7 @@
     },
     {
       "relationship_type": null,
-      "property": "created_at",
-      "types": [
-        "DateTime"
-      ],
-      "mandatory": true
-    },
-    {
-      "relationship_type": null,
-      "property": "rel_type",
-      "types": [
-        "String"
-      ],
-      "mandatory": true
-    },
-    {
-      "relationship_type": null,
-      "property": "score",
-      "types": [
-        "Double"
-      ],
-      "mandatory": true
-    },
-    {
-      "relationship_type": null,
-      "property": "evidence_chunks",
-      "types": [
-        "StringArray"
-      ],
-      "mandatory": true
-    },
-    {
-      "relationship_type": null,
-      "property": "justification",
+      "property": "reason",
       "types": [
         "String"
       ],

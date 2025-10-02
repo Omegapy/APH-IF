@@ -77,22 +77,20 @@ Key Features:
 
 from __future__ import annotations
 
-import logging
-import time
 import asyncio
+import logging
 import threading
-from typing import Any, Dict, List, Optional, Tuple, Union
+import time
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
-    from langchain_openai import OpenAIEmbeddings
     from langchain.tools import Tool
 except ImportError as e:
     logging.warning(f"LangChain imports failed: {e}. Vector search will use fallback mode.")
     # Fallback imports will be handled in function implementations
 
-from ...core.config import settings, EMBEDDING_CONFIG
-from ...core.llm_client import get_openai_client
+from ...core.config import EMBEDDING_CONFIG, settings
 from ...schema.schema_manager import get_schema_manager
 
 logger = logging.getLogger(__name__)
@@ -384,7 +382,7 @@ class SemanticSearchProviders:
                     timeout=EMBEDDING_CONFIG["timeout"],
                     max_retries=EMBEDDING_CONFIG["max_retries"]
                 )
-                logger.info(f"Provider: Initialized OpenAI embeddings client")
+                logger.info("Provider: Initialized OpenAI embeddings client")
             except Exception as e:
                 logger.error(f"Provider: Failed to initialize embeddings client: {e}")
                 raise
@@ -458,7 +456,12 @@ When referencing information from the context:
 - CRITICAL: For regulatory content, scan each source for section numbers (§, Part) and include them: "§75.1502 [3]"
 - Be comprehensive but ensure every claim is properly cited with specific regulatory sections
 
-If you don't know the answer based on the provided context, say you don't know.
+⚠️ ACRONYMS AND DEFINITIONS (STRICT):
+- Use the exact expansion from the sources on the FIRST mention: "Full Name (ACRONYM)".
+- Thereafter, use the acronym alone.
+- Never invent new expansions or alter the acronym letters.
+
+⚠️ If you don't know the answer based on the provided context, say you don't know.
 Focus on providing accurate information based on the knowledge graph content with proper citations.
 
 Context from knowledge graph:
@@ -483,6 +486,7 @@ def _detect_domain_markers(text: str) -> Dict[str, List[str]]:
         Mapping of domain name to list of detected markers in the text.
     """
     import re
+
     from ...core.config import settings
     
     patterns = {
@@ -1113,7 +1117,7 @@ class SemanticSearchEngine:
             else:
                 system_content = base_instructions
             
-            from langchain_core.messages import SystemMessage, HumanMessage
+            from langchain_core.messages import HumanMessage, SystemMessage
             messages = [
                 SystemMessage(content=system_content),
                 HumanMessage(content=query)
@@ -1342,7 +1346,7 @@ async def test_vector_search() -> None:
         logger.info(f"\nTesting: {query}")
         try:
             result = await search_semantic_detailed(query)
-            logger.info(f"Status: Success")
+            logger.info("Status: Success")
             logger.info(f"Sources found: {result['num_sources']}")
             logger.info(f"Entities: {len(result['entities_found'])}")
             logger.info(f"Response time: {result['search_time_ms']}ms")

@@ -61,7 +61,7 @@ import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
 from ..core.database import APHIFDatabase

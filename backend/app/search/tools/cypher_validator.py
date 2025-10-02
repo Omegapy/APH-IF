@@ -4,7 +4,6 @@
 # Date: 2025-09-15
 # [File Path] backend/app/search/tools/cypher_validator.py
 # ------------------------------------------------------------------------
-# Project:
 # Project: APH-IF
 #
 # Project description:
@@ -58,14 +57,14 @@ LLM Structural Cypher engine.
 
 from __future__ import annotations
 
+import logging
+
 # __________________________________________________________________________
 # Imports
-
 import re
-import logging
-from typing import Dict, Any, List, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Dict, List, Optional, Set
 
 from ...schema.schema_models import CompleteKGSchema
 
@@ -704,7 +703,7 @@ class CypherValidator:
                 if re.search(prop_pattern, fixed_cypher, re.IGNORECASE):
                     fixed_cypher = re.sub(prop_pattern, '', fixed_cypher, flags=re.IGNORECASE)
                     report.fixes_applied.append(FixApplied(
-                        description=f"Removed unknown property condition",
+                        description="Removed unknown property condition",
                         original_element=f"condition with {prop}",
                         fixed_element="(removed)",
                         fix_type="removal"

@@ -255,7 +255,7 @@ async def hybrid_health_check() -> JSONResponse:
         ):
             overall_status = "degraded"
 
-        hybrid_health: Dict[str, Any] = {
+        hybrid_health: dict[str, Any] = {
             "overall_status": overall_status,
             "timestamp": datetime.utcnow().isoformat(),
             "components": {
